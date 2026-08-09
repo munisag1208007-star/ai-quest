@@ -1,4 +1,27 @@
 /* --- 학습 페이지 다중 페이지 네비게이션 & 시각 카드 & AI 질문 --- */
+.learn-page {
+  max-width: 900px;
+  margin: 0 auto;
+}
+
+.learn-back {
+  margin-bottom: 16px;
+}
+
+.learn-loading {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 40px 0;
+  color: var(--muted);
+}
+
+.learn-title {
+  font-size: 32px;
+  font-weight: 800;
+  margin-top: 4px;
+}
+
 .learn-page-dots {
   display: flex;
   gap: 8px;
@@ -10,111 +33,239 @@
   height: 10px;
   border-radius: 999px;
   border: none;
-  background: rgba(255, 255, 255, 0.15);
+  background: rgba(255, 255, 255, 0.18);
   cursor: pointer;
-  transition: transform 0.15s ease;
+  transition: transform 0.15s ease, background 0.15s ease;
   padding: 0;
 }
 
 .learn-dot.active {
-  transform: scale(1.3);
+  transform: scale(1.4);
+}
+
+.learn-content {
+  padding: 36px 32px;
+  background: var(--panel);
+  border: 1px solid var(--border-strong);
+  border-radius: var(--radius-lg);
+  box-shadow: 0 12px 36px rgba(0, 0, 0, 0.4);
 }
 
 .learn-page-count {
   font-size: 0.8rem;
   opacity: 0.6;
-  margin-bottom: 4px;
+  font-family: var(--font-mono);
+  margin-bottom: 6px;
+  color: var(--amber);
 }
 
 .learn-page-title {
-  font-size: 1.4rem;
-  margin: 4px 0 8px;
+  font-size: 1.8rem;
+  font-weight: 700;
+  margin: 6px 0 14px;
+  color: var(--text);
+  letter-spacing: -0.01em;
 }
 
 .learn-page-summary {
-  opacity: 0.85;
-  margin-bottom: 20px;
+  font-size: 1.02rem;
+  line-height: 1.65;
+  color: var(--text);
+  opacity: 0.92;
+  margin-bottom: 28px;
+  background: rgba(245, 166, 35, 0.05);
+  border-left: 4px solid var(--amber);
+  padding: 12px 18px;
+  border-radius: 0 12px 12px 0;
 }
 
+/* 시각화 개념 카드 그리드 */
 .learn-visual-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
-  gap: 12px;
-  margin-bottom: 24px;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 16px;
+  margin: 24px 0 32px;
 }
 
 .learn-visual-card {
-  background: rgba(255, 255, 255, 0.04);
-  border: 1px solid rgba(255, 255, 255, 0.08);
-  border-radius: 12px;
-  padding: 16px 12px;
+  background: rgba(255, 255, 255, 0.025);
+  border: 1px solid var(--border-strong);
+  border-radius: var(--radius-md);
+  padding: 24px 20px;
   text-align: center;
+  transition: all 0.25 ease;
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.2);
+}
+
+.learn-visual-card:hover {
+  background: rgba(245, 166, 35, 0.05);
+  border-color: rgba(245, 166, 35, 0.4);
+  transform: translateY(-3px);
+  box-shadow: 0 8px 24px rgba(245, 166, 35, 0.15);
 }
 
 .learn-visual-emoji {
-  font-size: 2rem;
+  font-size: 2.2rem;
   display: block;
-  margin-bottom: 8px;
+  margin-bottom: 12px;
+  filter: drop-shadow(0 2px 8px rgba(0, 0, 0, 0.3));
 }
 
 .learn-visual-label {
-  font-weight: 600;
-  margin-bottom: 4px;
+  font-size: 0.98rem;
+  font-weight: 700;
+  color: var(--text);
+  margin-bottom: 6px;
+  letter-spacing: -0.01em;
 }
 
 .learn-visual-desc {
-  font-size: 0.8rem;
-  opacity: 0.7;
-  line-height: 1.4;
+  font-size: 0.82rem;
+  color: var(--muted);
+  line-height: 1.5;
+  opacity: 0.95;
+  margin: 0;
 }
 
 .learn-body {
-  line-height: 1.7;
+  font-size: 1.05rem;
+  line-height: 1.85;
+  color: #dedede;
+  padding-top: 24px;
+  border-top: 1px solid var(--border);
 }
 
 .learn-page-nav {
   display: flex;
   justify-content: space-between;
-  margin: 20px 0 32px;
+  margin: 24px 0 32px;
 }
 
+/* AI 질문하기 세션 (옅은 둥근 형태) */
 .learn-ask {
-  margin-top: 8px;
+  margin-top: 16px;
+  padding: 28px 32px;
+  background: rgba(255, 255, 255, 0.02);
+  border: 1px solid var(--border);
+  border-radius: 24px;
+  backdrop-filter: blur(8px);
 }
 
 .learn-ask-title {
-  font-size: 1.05rem;
-  margin-bottom: 12px;
+  font-size: 1.15rem;
+  font-weight: 700;
+  color: var(--amber);
+  margin-bottom: 18px;
 }
 
 .learn-ask-log {
   display: flex;
   flex-direction: column;
   gap: 12px;
-  margin-bottom: 16px;
+  margin-bottom: 20px;
 }
 
 .learn-ask-item {
   background: rgba(255, 255, 255, 0.03);
-  border-radius: 10px;
-  padding: 12px 14px;
+  border: 1px solid var(--border);
+  border-radius: 16px;
+  padding: 16px 20px;
 }
 
 .learn-ask-question {
-  font-weight: 600;
+  font-weight: 700;
+  color: var(--amber);
+  font-size: 0.95rem;
   margin-bottom: 6px;
 }
 
 .learn-ask-answer {
-  opacity: 0.85;
-  line-height: 1.6;
+  color: var(--text);
+  font-size: 0.95rem;
+  line-height: 1.65;
+  margin: 0;
 }
 
+/* 둥근 캡슐형 입력 폼 */
 .learn-ask-form {
   display: flex;
   gap: 10px;
+  align-items: center;
+  background: rgba(11, 18, 32, 0.7);
+  border: 1px solid var(--border-strong);
+  border-radius: 50px;
+  padding: 6px 8px 6px 20px;
+  transition: all 0.2s ease;
 }
 
-.learn-ask-form .input {
+.learn-ask-form:focus-within,
+.learn-ask-form:hover {
+  border-color: var(--amber);
+  box-shadow: 0 0 16px rgba(245, 166, 35, 0.2);
+  background: rgba(255, 255, 255, 0.03);
+}
+
+.learn-ask-input {
   flex: 1;
+  background: transparent;
+  border: none;
+  outline: none;
+  color: var(--text);
+  font-size: 14px;
+  font-family: var(--font-body);
+  padding: 8px 0;
+}
+
+.learn-ask-input::placeholder {
+  color: var(--muted-dim);
+  font-size: 14px;
+}
+
+.learn-ask-btn {
+  border-radius: 50px;
+  padding: 10px 24px;
+  font-weight: 700;
+  font-size: 14px;
+  background: var(--amber);
+  color: #1a1305;
+  border: none;
+  white-space: nowrap;
+  transition: all 0.2s ease;
+  cursor: pointer;
+}
+
+.learn-ask-btn:hover:not(:disabled) {
+  background: #ffb63d;
+  transform: scale(1.02);
+  box-shadow: 0 0 16px rgba(245, 166, 35, 0.35);
+}
+
+@media (max-width: 640px) {
+  .learn-content {
+    padding: 24px 18px;
+  }
+
+  .learn-visual-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .learn-ask {
+    padding: 20px 18px;
+    border-radius: 18px;
+  }
+
+  .learn-ask-form {
+    flex-direction: column;
+    border-radius: 20px;
+    padding: 12px;
+  }
+
+  .learn-ask-input {
+    width: 100%;
+    text-align: center;
+  }
+
+  .learn-ask-btn {
+    width: 100%;
+  }
 }

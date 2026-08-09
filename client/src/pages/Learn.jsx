@@ -146,7 +146,7 @@ export default function Learn() {
             </div>
 
             <div className="card learn-ask">
-              <h3 className="learn-ask-title">모르는 부분이 있나요? AI에게 물어보세요</h3>
+              <h3 className="learn-ask-title">💬 모르는 부분이 있나요? AI에게 물어보세요</h3>
 
               {chatLog.length > 0 && (
                 <div className="learn-ask-log">
@@ -164,15 +164,15 @@ export default function Learn() {
               <form className="learn-ask-form" onSubmit={handleAsk}>
                 <input
                   type="text"
-                  className="input"
-                  placeholder="예: 왜 이게 중요한가요?"
+                  className="learn-ask-input"
+                  placeholder="예: 이 주제의 동작 원리를 더 자세히 알려줘..."
                   value={question}
                   onChange={(e) => setQuestion(e.target.value)}
                   maxLength={500}
                   disabled={asking}
                 />
-                <button className="btn btn-primary" type="submit" disabled={asking || !question.trim()}>
-                  {asking ? "답변 생성 중..." : "질문하기"}
+                <button className="btn btn-primary learn-ask-btn" type="submit" disabled={asking || !question.trim()}>
+                  {asking ? "답변 생성 중..." : "질문하기 🚀"}
                 </button>
               </form>
             </div>
