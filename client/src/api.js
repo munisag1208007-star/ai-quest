@@ -25,6 +25,8 @@ export const api = {
   getMe: (token) => request("/api/auth/me", { token }),
   getTopics: (token) => request("/api/topics", { token }),
   getContent: (token, topicId) => request(`/api/content/${topicId}`, { token }),
+  askAboutTopic: (token, topicId, question) =>
+    request(`/api/content/${topicId}/ask`, { method: "POST", body: { question }, token }),
   getQuiz: (token, topicId) => request(`/api/quiz/${topicId}`, { token }),
   checkQuizAnswer: (token, topicId, payload) =>
     request(`/api/quiz/${topicId}/check`, { method: "POST", body: payload, token }),
