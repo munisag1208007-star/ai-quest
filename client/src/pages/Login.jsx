@@ -26,6 +26,10 @@ export default function Login() {
       loginSuccess(data);
       navigate(data.isFirstLogin ? "/welcome" : "/");
     } catch (err) {
+      if (err.data?.needsVerification) {
+        navigate("/verify-email", { state: { email } });
+        return;
+      }
       setError(err.message);
     } finally {
       setLoading(false);

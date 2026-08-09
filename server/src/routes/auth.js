@@ -3,6 +3,7 @@ import crypto from "crypto";
 import bcrypt from "bcryptjs";
 import db from "../db.js";
 import { signToken, requireAuth } from "../middleware/auth.js";
+import { sendVerificationEmail, generateVerificationCode, getExpiryTimestamp } from "../utils/email.js";
 
 const router = Router();
 
@@ -50,15 +51,87 @@ router.post("/signup", async (req, res) => {
   }
 
   const passwordHash = await bcrypt.hash(password, 10);
+  const code = generateVerificationCode();
+  const expires = getExpiryTimestamp(10);
+
   const info = db
     .prepare(
-      "INSERT INTO users (email, name, password_hash, provider, email_verified) VALUES (?, ?, ?, 'local', 1)"
+      `INSERT INTO users (email, name, password_hash, provider, email_verified, verification_code, verification_expires)
+       VALUES (?, ?, ?, 'local', 0, ?, ?)`
     )
-    .run(email, name, passwordHash);
+    .run(email, name, passwordHash, code, expires);
 
-  const user = db.prepare("SELECT * FROM users WHERE id = ?").get(info.lastInsertRowid);
-  const token = signToken(user);
-  res.status(201).json({ token, user: publicUser(user), isFirstLogin: true });
+  try {
+    await sendVerificationEmail(email, code);
+  } catch (err) {
+    console.error(err);
+    // 이메일 발송에 실패해도 계정은 이미 만들어졌으니, 재발송 라우트로 다시 시도할 수 있게 안내한다.
+    return res.status(502).json({
+      error: "인증 이메일 발송에 실패했어요. 잠시 후 인증 코드 재전송을 시도해주세요.",
+      email
+    });
+  }
+
+  res.status(201).json({ pendingVerification: true, email });
+});
+
+// ---------- 이메일 인증 코드 확인 ----------
+router.post("/verify-email", (req, res) => {
+  const { email, code } = req.body;
+  if (!email || !code) {
+    return res.status(400).json({ error: "이메일과 인증 코드를 입력해주세요." });
+  }
+
+  const user = db.prepare("SELECT * FROM users WHERE email = ?").get(email);
+  if (!user) {
+    return res.status(404).json({ error: "가입 정보를 찾을 수 없어요." });
+  }
+  if (user.email_verified) {
+    const token = signToken(user);
+    return res.json({ token, user: publicUser(user), isFirstLogin: !user.tutorial_completed });
+  }
+
+  if (!user.verification_code || user.verification_code !== code) {
+    return res.status(400).json({ error: "인증 코드가 올바르지 않아요." });
+  }
+  if (!user.verification_expires || new Date(user.verification_expires) < new Date()) {
+    return res.status(400).json({ error: "인증 코드가 만료됐어요. 재전송을 요청해주세요." });
+  }
+
+  db.prepare(
+    "UPDATE users SET email_verified = 1, verification_code = NULL, verification_expires = NULL WHERE id = ?"
+  ).run(user.id);
+
+  const updatedUser = db.prepare("SELECT * FROM users WHERE id = ?").get(user.id);
+  const token = signToken(updatedUser);
+  res.json({ token, user: publicUser(updatedUser), isFirstLogin: true });
+});
+
+// ---------- 인증 코드 재전송 ----------
+router.post("/resend-verification", async (req, res) => {
+  const { email } = req.body;
+  if (!email) return res.status(400).json({ error: "이메일을 입력해주세요." });
+
+  const user = db.prepare("SELECT * FROM users WHERE email = ?").get(email);
+  if (!user) return res.status(404).json({ error: "가입 정보를 찾을 수 없어요." });
+  if (user.email_verified) return res.status(409).json({ error: "이미 인증된 이메일이에요." });
+
+  const code = generateVerificationCode();
+  const expires = getExpiryTimestamp(10);
+  db.prepare("UPDATE users SET verification_code = ?, verification_expires = ? WHERE id = ?").run(
+    code,
+    expires,
+    user.id
+  );
+
+  try {
+    await sendVerificationEmail(email, code);
+  } catch (err) {
+    console.error(err);
+    return res.status(502).json({ error: "이메일 발송에 실패했어요. 잠시 후 다시 시도해주세요." });
+  }
+
+  res.json({ sent: true });
 });
 
 router.post("/login", async (req, res) => {
@@ -74,6 +147,14 @@ router.post("/login", async (req, res) => {
 
   if (!user || !(await bcrypt.compare(password, user.password_hash))) {
     return res.status(401).json({ error: "이메일 또는 비밀번호가 올바르지 않아요." });
+  }
+
+  if (!user.email_verified) {
+    return res.status(403).json({
+      error: "이메일 인증이 완료되지 않았어요. 인증 코드를 확인해주세요.",
+      needsVerification: true,
+      email: user.email
+    });
   }
 
   const token = signToken(user);
@@ -253,6 +334,7 @@ function finishOAuthLogin(res, { provider, providerId, email, name }) {
       return res.redirect(redirectUrl.toString());
     }
 
+    // 소셜 로그인은 플랫폼에서 이미 이메일 소유를 확인해줬으므로 인증 절차 없이 바로 인증 완료 처리한다.
     const info = db
       .prepare(
         "INSERT INTO users (email, name, provider, provider_id, email_verified) VALUES (?, ?, ?, ?, 1)"

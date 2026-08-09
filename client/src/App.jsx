@@ -2,6 +2,7 @@ import { Routes, Route, Navigate } from "react-router-dom";
 import ProtectedRoute from "./components/ProtectedRoute.jsx";
 import Login from "./pages/Login.jsx";
 import Signup from "./pages/Signup.jsx";
+import VerifyEmail from "./pages/VerifyEmail.jsx";
 import OAuthCallback from "./pages/OAuthCallback.jsx";
 import Welcome from "./pages/Welcome.jsx";
 import Home from "./pages/Home.jsx";
@@ -14,6 +15,7 @@ export default function App() {
     <Routes>
       <Route path="/login" element={<Login />} />
       <Route path="/signup" element={<Signup />} />
+      <Route path="/verify-email" element={<VerifyEmail />} />
       <Route path="/oauth/callback" element={<OAuthCallback />} />
 
       <Route path="/welcome" element={

@@ -1,7 +1,6 @@
 import { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { api } from "../api.js";
-import { useAuth } from "../context/AuthContext.jsx";
 import SocialButtons from "../components/SocialButtons.jsx";
 import "./Auth.css";
 
@@ -11,7 +10,6 @@ export default function Signup() {
   const [password, setPassword] = useState("");
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
-  const { loginSuccess } = useAuth();
   const navigate = useNavigate();
 
   async function handleSubmit(e) {
@@ -20,8 +18,7 @@ export default function Signup() {
     setLoading(true);
     try {
       const data = await api.signup({ name, email, password });
-      loginSuccess(data);
-      navigate("/welcome");
+      navigate("/verify-email", { state: { email: data.email || email } });
     } catch (err) {
       setError(err.message);
     } finally {

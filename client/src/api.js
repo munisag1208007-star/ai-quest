@@ -12,7 +12,9 @@ async function request(path, { method = "GET", body, token } = {}) {
 
   const data = await res.json().catch(() => ({}));
   if (!res.ok) {
-    throw new Error(data.error || "요청 처리 중 문제가 발생했어요.");
+    const err = new Error(data.error || "요청 처리 중 문제가 발생했어요.");
+    err.data = data;
+    throw err;
   }
   return data;
 }
@@ -20,6 +22,8 @@ async function request(path, { method = "GET", body, token } = {}) {
 export const api = {
   signup: (payload) => request("/api/auth/signup", { method: "POST", body: payload }),
   login: (payload) => request("/api/auth/login", { method: "POST", body: payload }),
+  verifyEmail: (payload) => request("/api/auth/verify-email", { method: "POST", body: payload }),
+  resendVerification: (payload) => request("/api/auth/resend-verification", { method: "POST", body: payload }),
   oauthUrl: (provider) => `${API_URL}/api/auth/${provider}`,
 
   getMe: (token) => request("/api/auth/me", { token }),
