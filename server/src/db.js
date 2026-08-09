@@ -1,13 +1,41 @@
-import Database from "better-sqlite3";
-import path from "path";
-import { fileURLToPath } from "url";
+import { createClient } from "@libsql/client";
 
-const __dirname = path.dirname(fileURLToPath(import.meta.url));
-const db = new Database(path.join(__dirname, "..", "data.sqlite"));
+const client = createClient({
+  url: process.env.TURSO_DATABASE_URL,
+  authToken: process.env.TURSO_AUTH_TOKEN
+});
 
-db.pragma("journal_mode = WAL");
+// ---------- 쿼리 헬퍼 ----------
+// better-sqlite3의 prepare().get()/.run()/.all() 스타일을 최대한 유지하되,
+// libsql 클라이언트는 비동기이므로 각 함수는 Promise를 반환한다.
+// 호출부(라우트 파일들)는 db.get(sql, args) / db.run(sql, args) / db.all(sql, args) 형태로
+// await 해서 사용한다.
+async function run(sql, args = []) {
+  const result = await client.execute({ sql, args });
+  return {
+    lastInsertRowid:
+      result.lastInsertRowid !== undefined && result.lastInsertRowid !== null
+        ? Number(result.lastInsertRowid)
+        : null,
+    changes: result.rowsAffected
+  };
+}
 
-db.exec(`
+async function get(sql, args = []) {
+  const result = await client.execute({ sql, args });
+  return result.rows[0];
+}
+
+async function all(sql, args = []) {
+  const result = await client.execute({ sql, args });
+  return result.rows;
+}
+
+// ---------- 스키마 초기화 ----------
+// 이 모듈은 ESM(import/export)이라 top-level await가 지원된다.
+// db.js를 import하는 순간 아래 초기화가 끝날 때까지 기다리므로,
+// 서버 쪽 다른 코드를 손댈 필요 없이 항상 스키마가 준비된 상태로 db를 쓸 수 있다.
+await client.executeMultiple(`
   CREATE TABLE IF NOT EXISTS users (
     id INTEGER PRIMARY KEY AUTOINCREMENT,
     email TEXT UNIQUE NOT NULL,
@@ -37,15 +65,14 @@ db.exec(`
     id INTEGER PRIMARY KEY AUTOINCREMENT,
     user_id INTEGER NOT NULL,
     topic_id TEXT NOT NULL,
-    questions_json TEXT NOT NULL,   -- [{question, options, correctIndex, explanation}]
-    answers_json TEXT NOT NULL DEFAULT '{}', -- { "0": { selected, correct }, ... }
+    questions_json TEXT NOT NULL,
+    answers_json TEXT NOT NULL DEFAULT '{}',
     created_at TEXT NOT NULL DEFAULT (datetime('now')),
     UNIQUE(user_id, topic_id),
     FOREIGN KEY(user_id) REFERENCES users(id)
   );
 
   -- Groq로 생성한 학습 콘텐츠를 주제 단위로 캐싱해서 API 호출/비용을 아낀다.
-  -- 콘텐츠는 사용자에 따라 달라지지 않으므로 topic_id만으로 캐싱한다.
   CREATE TABLE IF NOT EXISTS content_cache (
     topic_id TEXT PRIMARY KEY,
     markdown TEXT NOT NULL,
@@ -54,22 +81,20 @@ db.exec(`
 `);
 
 // ---------- 마이그레이션: 이메일 인증 관련 컬럼 추가 ----------
-// 이미 존재하는 DB(data.sqlite)에는 CREATE TABLE IF NOT EXISTS가 적용되지 않으므로,
-// 컬럼이 없을 때만 ALTER TABLE로 추가해준다. (기존 유저 데이터를 보존하기 위함)
-const existingColumns = db.prepare("PRAGMA table_info(users)").all().map((c) => c.name);
+const columnsResult = await client.execute("PRAGMA table_info(users)");
+const existingColumns = columnsResult.rows.map((c) => c.name);
 
 if (!existingColumns.includes("email_verified")) {
-  // 소셜 로그인(kakao/naver/google)으로 이미 가입된 기존 유저는 이메일 인증 절차가 없었으므로
-  // 마이그레이션 시점에 이미 인증된 것으로 간주해 로그인이 막히지 않게 한다.
-  db.exec(`ALTER TABLE users ADD COLUMN email_verified INTEGER NOT NULL DEFAULT 0`);
-  db.exec(`UPDATE users SET email_verified = 1 WHERE provider != 'local'`);
-  db.exec(`UPDATE users SET email_verified = 1 WHERE provider = 'local'`); // 기존 로컬 유저도 소급 인증 처리
+  await client.execute(`ALTER TABLE users ADD COLUMN email_verified INTEGER NOT NULL DEFAULT 0`);
+  await client.execute(`UPDATE users SET email_verified = 1 WHERE provider != 'local'`);
+  await client.execute(`UPDATE users SET email_verified = 1 WHERE provider = 'local'`);
 }
 if (!existingColumns.includes("verification_code")) {
-  db.exec(`ALTER TABLE users ADD COLUMN verification_code TEXT`);
+  await client.execute(`ALTER TABLE users ADD COLUMN verification_code TEXT`);
 }
 if (!existingColumns.includes("verification_expires")) {
-  db.exec(`ALTER TABLE users ADD COLUMN verification_expires TEXT`);
+  await client.execute(`ALTER TABLE users ADD COLUMN verification_expires TEXT`);
 }
 
+const db = { run, get, all };
 export default db;

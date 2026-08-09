@@ -45,7 +45,7 @@ router.post("/signup", async (req, res) => {
     return res.status(400).json({ error: "비밀번호는 6자 이상이어야 해요." });
   }
 
-  const existing = db.prepare("SELECT id FROM users WHERE email = ?").get(email);
+  const existing = await db.get("SELECT id FROM users WHERE email = ?", [email]);
   if (existing) {
     return res.status(409).json({ error: "이미 가입된 이메일이에요." });
   }
@@ -54,12 +54,11 @@ router.post("/signup", async (req, res) => {
   const code = generateVerificationCode();
   const expires = getExpiryTimestamp(10);
 
-  const info = db
-    .prepare(
-      `INSERT INTO users (email, name, password_hash, provider, email_verified, verification_code, verification_expires)
-       VALUES (?, ?, ?, 'local', 0, ?, ?)`
-    )
-    .run(email, name, passwordHash, code, expires);
+  await db.run(
+    `INSERT INTO users (email, name, password_hash, provider, email_verified, verification_code, verification_expires)
+     VALUES (?, ?, ?, 'local', 0, ?, ?)`,
+    [email, name, passwordHash, code, expires]
+  );
 
   try {
     await sendVerificationEmail(email, code);
@@ -76,13 +75,13 @@ router.post("/signup", async (req, res) => {
 });
 
 // ---------- 이메일 인증 코드 확인 ----------
-router.post("/verify-email", (req, res) => {
+router.post("/verify-email", async (req, res) => {
   const { email, code } = req.body;
   if (!email || !code) {
     return res.status(400).json({ error: "이메일과 인증 코드를 입력해주세요." });
   }
 
-  const user = db.prepare("SELECT * FROM users WHERE email = ?").get(email);
+  const user = await db.get("SELECT * FROM users WHERE email = ?", [email]);
   if (!user) {
     return res.status(404).json({ error: "가입 정보를 찾을 수 없어요." });
   }
@@ -98,11 +97,12 @@ router.post("/verify-email", (req, res) => {
     return res.status(400).json({ error: "인증 코드가 만료됐어요. 재전송을 요청해주세요." });
   }
 
-  db.prepare(
-    "UPDATE users SET email_verified = 1, verification_code = NULL, verification_expires = NULL WHERE id = ?"
-  ).run(user.id);
+  await db.run(
+    "UPDATE users SET email_verified = 1, verification_code = NULL, verification_expires = NULL WHERE id = ?",
+    [user.id]
+  );
 
-  const updatedUser = db.prepare("SELECT * FROM users WHERE id = ?").get(user.id);
+  const updatedUser = await db.get("SELECT * FROM users WHERE id = ?", [user.id]);
   const token = signToken(updatedUser);
   res.json({ token, user: publicUser(updatedUser), isFirstLogin: true });
 });
@@ -112,17 +112,17 @@ router.post("/resend-verification", async (req, res) => {
   const { email } = req.body;
   if (!email) return res.status(400).json({ error: "이메일을 입력해주세요." });
 
-  const user = db.prepare("SELECT * FROM users WHERE email = ?").get(email);
+  const user = await db.get("SELECT * FROM users WHERE email = ?", [email]);
   if (!user) return res.status(404).json({ error: "가입 정보를 찾을 수 없어요." });
   if (user.email_verified) return res.status(409).json({ error: "이미 인증된 이메일이에요." });
 
   const code = generateVerificationCode();
   const expires = getExpiryTimestamp(10);
-  db.prepare("UPDATE users SET verification_code = ?, verification_expires = ? WHERE id = ?").run(
+  await db.run("UPDATE users SET verification_code = ?, verification_expires = ? WHERE id = ?", [
     code,
     expires,
     user.id
-  );
+  ]);
 
   try {
     await sendVerificationEmail(email, code);
@@ -136,7 +136,7 @@ router.post("/resend-verification", async (req, res) => {
 
 router.post("/login", async (req, res) => {
   const { email, password } = req.body;
-  const user = db.prepare("SELECT * FROM users WHERE email = ?").get(email);
+  const user = await db.get("SELECT * FROM users WHERE email = ?", [email]);
 
   // 소셜 로그인으로 가입한 이메일로 비밀번호 로그인을 시도한 경우, 원인을 명확히 알려준다.
   if (user && user.provider !== "local") {
@@ -162,8 +162,8 @@ router.post("/login", async (req, res) => {
 });
 
 // 소셜 로그인 직후 프론트가 실제 사용자 정보를 채우기 위해 호출
-router.get("/me", requireAuth, (req, res) => {
-  const user = db.prepare("SELECT * FROM users WHERE id = ?").get(req.userId);
+router.get("/me", requireAuth, async (req, res) => {
+  const user = await db.get("SELECT * FROM users WHERE id = ?", [req.userId]);
   if (!user) return res.status(404).json({ error: "사용자를 찾을 수 없어요." });
   res.json({ user: publicUser(user) });
 });
@@ -204,7 +204,7 @@ router.get("/kakao/callback", async (req, res) => {
     const email = profile.kakao_account?.email || `kakao_${providerId}@no-email.local`;
     const name = profile.kakao_account?.profile?.nickname || "카카오 사용자";
 
-    finishOAuthLogin(res, { provider: "kakao", providerId, email, name });
+    await finishOAuthLogin(res, { provider: "kakao", providerId, email, name });
   } catch (err) {
     console.error(err);
     res.redirect(`${process.env.CLIENT_URL}/login?error=kakao`);
@@ -258,7 +258,7 @@ router.get("/naver/callback", async (req, res) => {
     const profileData = await profileRes.json();
     const profile = profileData.response;
 
-    finishOAuthLogin(res, {
+    await finishOAuthLogin(res, {
       provider: "naver",
       providerId: profile.id,
       email: profile.email || `naver_${profile.id}@no-email.local`,
@@ -304,7 +304,7 @@ router.get("/google/callback", async (req, res) => {
     });
     const profile = await profileRes.json();
 
-    finishOAuthLogin(res, {
+    await finishOAuthLogin(res, {
       provider: "google",
       providerId: profile.id,
       email: profile.email,
@@ -317,15 +317,16 @@ router.get("/google/callback", async (req, res) => {
 });
 
 // 소셜 로그인 공통 처리
-function finishOAuthLogin(res, { provider, providerId, email, name }) {
-  let user = db
-    .prepare("SELECT * FROM users WHERE provider = ? AND provider_id = ?")
-    .get(provider, providerId);
+async function finishOAuthLogin(res, { provider, providerId, email, name }) {
+  let user = await db.get("SELECT * FROM users WHERE provider = ? AND provider_id = ?", [
+    provider,
+    providerId
+  ]);
 
   let isFirstLogin = false;
 
   if (!user) {
-    const emailOwner = email ? db.prepare("SELECT * FROM users WHERE email = ?").get(email) : null;
+    const emailOwner = email ? await db.get("SELECT * FROM users WHERE email = ?", [email]) : null;
 
     if (emailOwner) {
       const redirectUrl = new URL("/login", process.env.CLIENT_URL);
@@ -335,12 +336,11 @@ function finishOAuthLogin(res, { provider, providerId, email, name }) {
     }
 
     // 소셜 로그인은 플랫폼에서 이미 이메일 소유를 확인해줬으므로 인증 절차 없이 바로 인증 완료 처리한다.
-    const info = db
-      .prepare(
-        "INSERT INTO users (email, name, provider, provider_id, email_verified) VALUES (?, ?, ?, ?, 1)"
-      )
-      .run(email, name, provider, providerId);
-    user = db.prepare("SELECT * FROM users WHERE id = ?").get(info.lastInsertRowid);
+    const info = await db.run(
+      "INSERT INTO users (email, name, provider, provider_id, email_verified) VALUES (?, ?, ?, ?, 1)",
+      [email, name, provider, providerId]
+    );
+    user = await db.get("SELECT * FROM users WHERE id = ?", [info.lastInsertRowid]);
     isFirstLogin = true;
   } else {
     isFirstLogin = !user.tutorial_completed;

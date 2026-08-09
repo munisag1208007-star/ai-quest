@@ -5,10 +5,8 @@ import db from "../db.js";
 
 const router = Router();
 
-router.get("/dashboard", requireAuth, (req, res) => {
-  const rows = db
-    .prepare("SELECT * FROM progress WHERE user_id = ?")
-    .all(req.userId);
+router.get("/dashboard", requireAuth, async (req, res) => {
+  const rows = await db.all("SELECT * FROM progress WHERE user_id = ?", [req.userId]);
 
   const completed = rows.filter((r) => r.status === "completed").length;
   const inProgress = rows.filter((r) => r.status === "learning").length;
@@ -36,8 +34,8 @@ router.get("/dashboard", requireAuth, (req, res) => {
   });
 });
 
-router.post("/complete-tutorial", requireAuth, (req, res) => {
-  db.prepare("UPDATE users SET tutorial_completed = 1 WHERE id = ?").run(req.userId);
+router.post("/complete-tutorial", requireAuth, async (req, res) => {
+  await db.run("UPDATE users SET tutorial_completed = 1 WHERE id = ?", [req.userId]);
   res.json({ ok: true });
 });
 

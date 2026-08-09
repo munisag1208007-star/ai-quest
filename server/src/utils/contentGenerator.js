@@ -85,7 +85,7 @@ async function generatePages(topic) {
 // topic의 학습 페이지들을 캐시에서 가져오거나, 없으면 새로 생성해서 캐시에 저장한다.
 // 퀴즈 생성 시에도 이 함수를 그대로 재사용해서, 학습한 내용과 다른 문제가 나오지 않도록 한다.
 export async function getOrCreateContent(topic) {
-  const cached = db.prepare("SELECT markdown FROM content_cache WHERE topic_id = ?").get(topic.id);
+  const cached = await db.get("SELECT markdown FROM content_cache WHERE topic_id = ?", [topic.id]);
 
   if (cached) {
     try {
@@ -104,10 +104,11 @@ export async function getOrCreateContent(topic) {
 
   const pages = await generatePages(topic);
 
-  db.prepare(
+  await db.run(
     `INSERT INTO content_cache (topic_id, markdown) VALUES (?, ?)
-     ON CONFLICT(topic_id) DO UPDATE SET markdown = excluded.markdown, created_at = datetime('now')`
-  ).run(topic.id, JSON.stringify({ pages }));
+     ON CONFLICT(topic_id) DO UPDATE SET markdown = excluded.markdown, created_at = datetime('now')`,
+    [topic.id, JSON.stringify({ pages })]
+  );
 
   return pages;
 }

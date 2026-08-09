@@ -93,14 +93,15 @@ ${contentSummary}
     }
 
     // 정답이 포함된 전체 데이터는 서버에만 저장 (재도전 시 이전 세션은 덮어씀).
-    db.prepare(
+    await db.run(
       `INSERT INTO quiz_sessions (user_id, topic_id, questions_json, answers_json)
        VALUES (?, ?, ?, '{}')
        ON CONFLICT(user_id, topic_id)
        DO UPDATE SET questions_json = excluded.questions_json,
                       answers_json = '{}',
-                      created_at = datetime('now')`
-    ).run(req.userId, topic.id, JSON.stringify(data.questions));
+                      created_at = datetime('now')`,
+      [req.userId, topic.id, JSON.stringify(data.questions)]
+    );
 
     res.json({ topic, questions: sanitizeForClient(data.questions) });
   } catch (err) {
@@ -112,7 +113,7 @@ ${contentSummary}
 // ---------- 한 문제 채점 ----------
 // 사용자가 한 문제를 고르고 "정답 확인"을 누를 때마다 호출.
 // 서버가 저장해둔 정답과 대조해서 결과와 해설만 내려준다.
-router.post("/:topicId/check", requireAuth, (req, res) => {
+router.post("/:topicId/check", requireAuth, async (req, res) => {
   const topic = TOPICS.find((t) => t.id === req.params.topicId);
   if (!topic) return res.status(404).json({ error: "존재하지 않는 주제예요." });
 
@@ -121,9 +122,10 @@ router.post("/:topicId/check", requireAuth, (req, res) => {
     return res.status(400).json({ error: "답안 데이터가 올바르지 않아요." });
   }
 
-  const session = db
-    .prepare("SELECT * FROM quiz_sessions WHERE user_id = ? AND topic_id = ?")
-    .get(req.userId, topic.id);
+  const session = await db.get(
+    "SELECT * FROM quiz_sessions WHERE user_id = ? AND topic_id = ?",
+    [req.userId, topic.id]
+  );
 
   if (!session) {
     return res.status(409).json({ error: "퀴즈 세션을 찾을 수 없어요. 퀴즈를 다시 불러와주세요." });
@@ -149,24 +151,25 @@ router.post("/:topicId/check", requireAuth, (req, res) => {
   const correct = selected === question.correctIndex;
   answers[index] = { selected, correct };
 
-  db.prepare("UPDATE quiz_sessions SET answers_json = ? WHERE user_id = ? AND topic_id = ?").run(
+  await db.run("UPDATE quiz_sessions SET answers_json = ? WHERE user_id = ? AND topic_id = ?", [
     JSON.stringify(answers),
     req.userId,
     topic.id
-  );
+  ]);
 
   res.json({ correct, correctIndex: question.correctIndex, explanation: question.explanation });
 });
 
 // ---------- 최종 제출 ----------
 // 클라이언트가 점수를 계산해서 보내는 게 아니라, 서버가 저장해둔 채점 기록으로 직접 점수를 낸다.
-router.post("/:topicId/submit", requireAuth, (req, res) => {
+router.post("/:topicId/submit", requireAuth, async (req, res) => {
   const topic = TOPICS.find((t) => t.id === req.params.topicId);
   if (!topic) return res.status(404).json({ error: "존재하지 않는 주제예요." });
 
-  const session = db
-    .prepare("SELECT * FROM quiz_sessions WHERE user_id = ? AND topic_id = ?")
-    .get(req.userId, topic.id);
+  const session = await db.get(
+    "SELECT * FROM quiz_sessions WHERE user_id = ? AND topic_id = ?",
+    [req.userId, topic.id]
+  );
 
   if (!session) {
     return res.status(409).json({ error: "퀴즈 세션을 찾을 수 없어요. 퀴즈를 다시 불러와주세요." });
@@ -185,14 +188,15 @@ router.post("/:topicId/submit", requireAuth, (req, res) => {
   const percent = Math.round((score / total) * 100);
   const passed = percent >= 60;
 
-  const existing = db
-    .prepare("SELECT * FROM progress WHERE user_id = ? AND topic_id = ?")
-    .get(req.userId, topic.id);
+  const existing = await db.get(
+    "SELECT * FROM progress WHERE user_id = ? AND topic_id = ?",
+    [req.userId, topic.id]
+  );
 
   const bestScore = Math.max(existing?.best_score || 0, percent);
   const status = passed ? "completed" : "learning";
 
-  db.prepare(
+  await db.run(
     `INSERT INTO progress (user_id, topic_id, status, best_score, attempts)
      VALUES (?, ?, ?, ?, 1)
      ON CONFLICT(user_id, topic_id)
@@ -200,11 +204,15 @@ router.post("/:topicId/submit", requireAuth, (req, res) => {
        status = CASE WHEN excluded.status = 'completed' OR progress.status = 'completed' THEN 'completed' ELSE excluded.status END,
        best_score = MAX(progress.best_score, excluded.best_score),
        attempts = progress.attempts + 1,
-       updated_at = datetime('now')`
-  ).run(req.userId, topic.id, status, bestScore);
+       updated_at = datetime('now')`,
+    [req.userId, topic.id, status, bestScore]
+  );
 
   // 세션 소모: 같은 결과로 다시 제출(재요청 반복)해서 attempts를 부풀리지 못하게 삭제.
-  db.prepare("DELETE FROM quiz_sessions WHERE user_id = ? AND topic_id = ?").run(req.userId, topic.id);
+  await db.run("DELETE FROM quiz_sessions WHERE user_id = ? AND topic_id = ?", [
+    req.userId,
+    topic.id
+  ]);
 
   res.json({ score, total, percent, passed, bestScore: Math.max(bestScore, percent) });
 });

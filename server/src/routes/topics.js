@@ -5,10 +5,11 @@ import db from "../db.js";
 
 const router = Router();
 
-router.get("/", requireAuth, (req, res) => {
-  const rows = db
-    .prepare("SELECT topic_id, status, best_score FROM progress WHERE user_id = ?")
-    .all(req.userId);
+router.get("/", requireAuth, async (req, res) => {
+  const rows = await db.all(
+    "SELECT topic_id, status, best_score FROM progress WHERE user_id = ?",
+    [req.userId]
+  );
   const progressMap = Object.fromEntries(rows.map((r) => [r.topic_id, r]));
 
   const topics = TOPICS.map((t) => ({

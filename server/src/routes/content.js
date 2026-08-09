@@ -15,13 +15,14 @@ router.get("/:topicId", requireAuth, async (req, res) => {
     const pages = await getOrCreateContent(topic);
 
     // 학습 시작으로 진행 상태 갱신 (완료 상태는 덮어쓰지 않음)
-    db.prepare(
+    await db.run(
       `INSERT INTO progress (user_id, topic_id, status)
        VALUES (?, ?, 'learning')
        ON CONFLICT(user_id, topic_id)
        DO UPDATE SET status = CASE WHEN status = 'not_started' THEN 'learning' ELSE status END,
-                      updated_at = datetime('now')`
-    ).run(req.userId, topic.id);
+                      updated_at = datetime('now')`,
+      [req.userId, topic.id]
+    );
 
     res.json({ topic, pages });
   } catch (err) {
