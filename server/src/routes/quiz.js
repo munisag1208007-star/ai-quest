@@ -2,6 +2,7 @@ import { Router } from "express";
 import { requireAuth } from "../middleware/auth.js";
 import { askGemini } from "../utils/groq.js";
 import { getOrCreateContent } from "../utils/contentGenerator.js";
+import { findForbiddenInQuestions } from "../utils/textValidation.js";
 import { TOPICS } from "../data/topics.js";
 import db from "../db.js";
 
@@ -45,19 +46,50 @@ router.get("/:topicId", requireAuth, async (req, res) => {
   if (!topic) return res.status(404).json({ error: "존재하지 않는 주제예요." });
 
   try {
-   const prompt = `"${topic.name}" (${topic.maker})에 대한 고등학생 수준의 객관식 퀴즈 5문제를 만들어주세요.
+    const pages = await getOrCreateContent(topic);
+    const contentSummary = pages
+      .map((p, i) => `[${i + 1}페이지: ${p.title}]\n${p.body}`)
+      .join("\n\n");
+
+    const prompt = `아래는 "${topic.name}" (${topic.maker})에 대한 학습 자료입니다.
+
+${contentSummary}
+
+이 학습 자료의 내용만을 바탕으로, 고등학생 수준의 객관식 퀴즈 5문제를 만들어주세요.
 
 반드시 지켜야 할 규칙:
-- 모든 텍스트(question, options, explanation)는 100% 자연스러운 한국어로만 작성하세요. 영어 단어나 알파벳 조각이 섞이면 안 됩니다.
+- 학습 자료에 나온 내용 범위를 절대 벗어나지 마세요. 자료에 없는 사실을 지어내면 안 됩니다.
+- 모든 텍스트(question, options, explanation)는 100% 자연스러운 한국어로만 작성하세요.
+- 한자(중국어 문자)를 절대 사용하지 마세요. 순수 한글로만 쓰세요.
+- 알파벳 조각이나 의미 없는 영문 파편도 섞이면 안 됩니다.
 - 각 문제는 4개의 선택지를 가지고, 정답은 하나만 있어야 합니다.
 - 너무 지엽적인 지식보다는 개념 이해를 확인하는 문제로 구성해주세요.
-- 문장이 중간에 끊기거나 미완성 단어가 나오지 않도록 완결된 문장으로 작성하세요.
+- 문장이 중간에 끊기지 않도록 완결된 문장으로 작성하세요.
 - 반드시 JSON으로만 응답하세요. 마크다운 코드블록도 포함하지 마세요.`;
 
-    const data = await askGemini(prompt, { json: true, schema: quizSchema });
+    let data;
+    let lastError;
+    const maxAttempts = 3;
+    for (let attempt = 1; attempt <= maxAttempts; attempt++) {
+      try {
+        const result = await askGemini(prompt, { json: true, schema: quizSchema });
+        if (!Array.isArray(result.questions) || result.questions.length === 0) {
+          lastError = new Error("퀴즈 형식이 올바르지 않아요.");
+          continue;
+        }
+        if (findForbiddenInQuestions(result.questions)) {
+          lastError = new Error("생성된 퀴즈에 이상 문자가 섞여 있어 다시 생성했어요.");
+          continue;
+        }
+        data = result;
+        break;
+      } catch (err) {
+        lastError = err;
+      }
+    }
 
-    if (!Array.isArray(data.questions) || data.questions.length === 0) {
-      throw new Error("퀴즈 형식이 올바르지 않아요.");
+    if (!data) {
+      throw lastError || new Error("퀴즈 생성에 실패했어요.");
     }
 
     // 정답이 포함된 전체 데이터는 서버에만 저장 (재도전 시 이전 세션은 덮어씀).

@@ -1,4 +1,5 @@
 import { askGemini } from "./groq.js";
+import { findForbiddenInPages } from "./textValidation.js";
 import db from "../db.js";
 
 const pagesSchema = {
@@ -47,11 +48,38 @@ function buildPrompt(topic) {
 4페이지(선택) - 알아두면 좋은 점, 한계나 주의사항
 
 반드시 지켜야 할 규칙:
-- 모든 텍스트는 100% 자연스러운 한국어로 작성하세요. 알파벳 조각이나 의미 없는 영문 파편이 섞이면 안 됩니다.
+- 모든 텍스트는 100% 자연스러운 한국어로 작성하세요.
+- 한자(중국어 문자, 예: 聊天, 搜索 등)를 절대 사용하지 마세요. "채팅", "검색"처럼 반드시 한글로만 쓰세요.
+- 알파벳 조각이나 의미 없는 영문 파편도 섞이면 안 됩니다.
 - 각 페이지의 body는 3~5문장, 전문 용어는 풀어서 설명하세요.
-- 각 페이지마다 visualItems를 2~4개 만드세요. 각 항목은 그 페이지 내용을 상징하는 이모지 1개, 짧은 라벨(3~8자), 한 줄 설명으로 구성하세요. 실제로 의미가 통하는 이모지를 고르세요.
+- 각 페이지마다 visualItems를 2~4개 만드세요. 각 항목은 그 페이지 내용을 상징하는 이모지 1개, 짧은 라벨(3~8자, 순수 한글), 한 줄 설명(순수 한글)으로 구성하세요.
 - 문장이 중간에 끊기지 않도록 완결된 문장으로 작성하세요.
 - 반드시 JSON으로만 응답하세요. 마크다운 코드블록도 포함하지 마세요.`;
+}
+
+async function generatePages(topic) {
+  const maxAttempts = 3;
+  let lastError;
+
+  for (let attempt = 1; attempt <= maxAttempts; attempt++) {
+    try {
+      const data = await askGemini(buildPrompt(topic), { json: true, schema: pagesSchema });
+      if (!Array.isArray(data.pages) || data.pages.length < 3) {
+        lastError = new Error("학습 콘텐츠 형식이 올바르지 않아요.");
+        continue;
+      }
+      // 한자 등 이상 문자가 섞여 있으면 이 결과는 버리고 다시 생성한다.
+      if (findForbiddenInPages(data.pages)) {
+        lastError = new Error("생성된 콘텐츠에 이상 문자가 섞여 있어 다시 생성했어요.");
+        continue;
+      }
+      return data.pages;
+    } catch (err) {
+      lastError = err;
+    }
+  }
+
+  throw lastError || new Error("학습 콘텐츠 생성에 실패했어요.");
 }
 
 // topic의 학습 페이지들을 캐시에서 가져오거나, 없으면 새로 생성해서 캐시에 저장한다.
@@ -62,7 +90,11 @@ export async function getOrCreateContent(topic) {
   if (cached) {
     try {
       const parsed = JSON.parse(cached.markdown);
-      if (Array.isArray(parsed.pages) && parsed.pages.length >= 3) {
+      if (
+        Array.isArray(parsed.pages) &&
+        parsed.pages.length >= 3 &&
+        !findForbiddenInPages(parsed.pages)
+      ) {
         return parsed.pages;
       }
     } catch {
@@ -70,15 +102,12 @@ export async function getOrCreateContent(topic) {
     }
   }
 
-  const data = await askGemini(buildPrompt(topic), { json: true, schema: pagesSchema });
-  if (!Array.isArray(data.pages) || data.pages.length < 3) {
-    throw new Error("학습 콘텐츠 형식이 올바르지 않아요.");
-  }
+  const pages = await generatePages(topic);
 
   db.prepare(
     `INSERT INTO content_cache (topic_id, markdown) VALUES (?, ?)
      ON CONFLICT(topic_id) DO UPDATE SET markdown = excluded.markdown, created_at = datetime('now')`
-  ).run(topic.id, JSON.stringify({ pages: data.pages }));
+  ).run(topic.id, JSON.stringify({ pages }));
 
-  return data.pages;
+  return pages;
 }
