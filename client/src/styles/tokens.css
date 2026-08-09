@@ -37,7 +37,7 @@ html,
 body {
   margin: 0;
   padding: 0;
-  background: var(--ink);
+  background-color: #070d19;
   color: var(--text);
   font-family: var(--font-body);
   -webkit-font-smoothing: antialiased;
@@ -45,11 +45,47 @@ body {
 
 body {
   background-image:
-    radial-gradient(circle at 12% 8%, rgba(245, 166, 35, 0.07), transparent 40%),
-    radial-gradient(circle at 88% 92%, rgba(110, 231, 183, 0.06), transparent 42%);
+    /* 회로 도트 마이크로 그리드 */
+    radial-gradient(rgba(245, 166, 35, 0.12) 1.5px, transparent 1.5px),
+    /* 은은한 네온 그리드 라인 */
+    linear-gradient(to right, rgba(255, 255, 255, 0.025) 1px, transparent 1px),
+    linear-gradient(to bottom, rgba(255, 255, 255, 0.025) 1px, transparent 1px),
+    /* 입체 오로라 조명 오르브 */
+    radial-gradient(circle at 10% 12%, rgba(245, 166, 35, 0.16), transparent 45%),
+    radial-gradient(circle at 88% 20%, rgba(125, 211, 252, 0.14), transparent 48%),
+    radial-gradient(circle at 50% 65%, rgba(139, 92, 246, 0.14), transparent 52%),
+    radial-gradient(circle at 92% 88%, rgba(110, 231, 183, 0.12), transparent 42%);
+  background-size: 32px 32px, 64px 64px, 64px 64px, 100% 100%, 100% 100%, 100% 100%, 100% 100%;
   background-attachment: fixed;
   min-height: 100vh;
+  position: relative;
+  overflow-x: hidden;
 }
+
+/* 동적 오로라 펄스 하이라이트 레이어 */
+body::before {
+  content: "";
+  position: fixed;
+  top: -15%;
+  left: 25%;
+  width: 50vw;
+  height: 50vw;
+  max-width: 750px;
+  max-height: 750px;
+  background: radial-gradient(circle, rgba(245, 166, 35, 0.1) 0%, rgba(139, 92, 246, 0.06) 45%, transparent 70%);
+  border-radius: 50%;
+  pointer-events: none;
+  filter: blur(70px);
+  z-index: -1;
+  animation: auroraPulse 14s ease-in-out infinite alternate;
+}
+
+@keyframes auroraPulse {
+  0% { transform: translate(0, 0) scale(1); opacity: 0.7; }
+  50% { transform: translate(6%, 10%) scale(1.12); opacity: 0.95; }
+  100% { transform: translate(-5%, 6%) scale(0.92); opacity: 0.75; }
+}
+
 
 h1, h2, h3, h4 {
   font-family: var(--font-display);
