@@ -1,5 +1,5 @@
 import { askGemini } from "./groq.js";
-import { findForbiddenInPages } from "./textValidation.js";
+import { findForbiddenInPages, sanitizeObjectHanja } from "./textValidation.js";
 import db from "../db.js";
 
 const pagesSchema = {
@@ -95,7 +95,7 @@ export async function getOrCreateContent(topic) {
         parsed.pages.length >= 3 &&
         !findForbiddenInPages(parsed.pages)
       ) {
-        return parsed.pages;
+        return sanitizeObjectHanja(parsed.pages);
       }
     } catch {
       // 예전 형식(순수 마크다운 텍스트)으로 캐시된 항목은 무시하고 새로 생성한다.

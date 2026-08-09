@@ -1,5 +1,6 @@
 import { Router } from "express";
 import { requireAuth } from "../middleware/auth.js";
+import { removeHanja } from "../utils/textValidation.js";
 import db from "../db.js";
 
 const router = Router();
@@ -12,10 +13,15 @@ router.get("/", requireAuth, async (req, res) => {
       [req.userId]
     );
 
-    const parsedList = list.map((item) => ({
-      ...item,
-      options: JSON.parse(item.options_json || "[]")
-    }));
+    const parsedList = list.map((item) => {
+      const rawOpts = JSON.parse(item.options_json || "[]");
+      return {
+        ...item,
+        question: removeHanja(item.question),
+        explanation: removeHanja(item.explanation),
+        options: rawOpts.map((opt) => removeHanja(opt))
+      };
+    });
 
     res.json({ wrongAnswers: parsedList });
   } catch (err) {

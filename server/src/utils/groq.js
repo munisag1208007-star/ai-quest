@@ -1,18 +1,11 @@
 import "dotenv/config";
+import { removeHanja, sanitizeObjectHanja } from "./textValidation.js";
 
-// Groq는 OpenAI와 호환되는 API 형식을 사용한다 (무료, 카드 등록 불필요).
 const MODEL = "llama-3.3-70b-versatile";
 const API_URL = "https://api.groq.com/openai/v1/chat/completions";
 
 /**
  * Groq API에 프롬프트를 보내고 텍스트(또는 JSON) 응답을 받아온다.
- * askGemini와 동일한 시그니처를 유지해서 content.js / quiz.js는 import만 바꾸면 되도록 했다.
- *
- * @param {string} prompt
- * @param {{ json?: boolean, schema?: object }} options
- *   - json: true면 JSON 형식으로만 응답하도록 강제
- *   - schema: Groq는 OpenAI처럼 엄격한 JSON 스키마 강제(strict mode)를 지원하지 않으므로,
- *             스키마가 있으면 프롬프트에 스키마 설명을 덧붙여서 모델이 형식을 따르도록 유도한다.
  */
 export async function askGemini(prompt, { json = false, schema = null, temperature = 0.7 } = {}) {
   const apiKey = process.env.GROQ_API_KEY;
@@ -22,14 +15,23 @@ export async function askGemini(prompt, { json = false, schema = null, temperatu
     );
   }
 
-  let finalPrompt = prompt;
+  // 한자 사용 금지 지시사항을 무조건 프롬프트에 추가하여 모델 차원에서 차단
+  const strictLanguageRule = "\n\n[엄격한 언어 작성 규칙]: 절대로 한자(漢字, Chinese Characters)나 불필요한 중국어/외국어 문자를 포함하지 마세요. 모든 내용, 단어, 질문, 선택지 및 설명은 100% 순수한 한글과 자연스러운 한국어로만 출력해야 합니다.";
+
+  let finalPrompt = prompt + strictLanguageRule;
   if (json && schema) {
     finalPrompt += `\n\n반드시 아래 JSON 스키마를 정확히 따르는 JSON 객체 하나로만 응답하세요. 다른 설명이나 마크다운 코드블록 없이 순수 JSON만 출력하세요.\n\n스키마:\n${JSON.stringify(schema)}`;
   }
 
   const body = {
     model: MODEL,
-    messages: [{ role: "user", content: finalPrompt }],
+    messages: [
+      {
+        role: "system",
+        content: "당신은 한국어 전용 AI 학습 교육 어시스턴트입니다. 오직 한글(가-힣)과 표준 한국어로만 모든 응답을 작성하세요. 한자(漢字) 문자는 절대 출력에 포함하지 마세요."
+      },
+      { role: "user", content: finalPrompt }
+    ],
     temperature: temperature !== undefined ? Number(temperature) : 0.7,
     max_tokens: 2048
   };
@@ -53,8 +55,14 @@ export async function askGemini(prompt, { json = false, schema = null, temperatu
   }
 
   const data = await res.json();
-  const text = data?.choices?.[0]?.message?.content;
+  let text = data?.choices?.[0]?.message?.content;
   if (!text) throw new Error("Groq API가 빈 응답을 반환했습니다.");
 
-  return json ? JSON.parse(text) : text;
+  // 안전장치: 혹시라도 텍스트에 한자가 남아있으면 강제 정제
+  if (json) {
+    const parsed = JSON.parse(text);
+    return sanitizeObjectHanja(parsed);
+  } else {
+    return removeHanja(text);
+  }
 }
