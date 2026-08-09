@@ -77,3 +77,32 @@
   gap: 18px;
   margin-top: 32px;
 }
+
+@media (max-width: 640px) {
+  .home-title {
+    font-size: 26px;
+  }
+
+  .home-sub {
+    font-size: 14px;
+  }
+
+  .hero-stats {
+    flex-wrap: wrap;
+    gap: 8px;
+  }
+
+  .stat-chip {
+    padding: 8px 12px;
+    flex: 1;
+    min-width: 90px;
+    justify-content: center;
+  }
+
+  .topic-grid {
+    grid-template-columns: 1fr;
+    gap: 14px;
+    margin-top: 24px;
+  }
+}
+
