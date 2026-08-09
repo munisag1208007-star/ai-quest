@@ -1,0 +1,79 @@
+.hero {
+  position: relative;
+  padding-top: 8px;
+  margin-bottom: 40px;
+}
+
+.hero-trace {
+  position: absolute;
+  top: -18px;
+  left: 0;
+  width: 100%;
+  height: 40px;
+  opacity: 0.6;
+  pointer-events: none;
+}
+
+.hero-trace-line {
+  fill: none;
+  stroke: var(--border-strong);
+  stroke-width: 1.5;
+}
+
+.hero-node {
+  stroke: var(--ink);
+  stroke-width: 2;
+}
+.node-amber { fill: var(--amber); }
+.node-mint { fill: var(--mint); }
+.node-coral { fill: var(--coral); }
+
+.home-title {
+  font-size: 34px;
+  margin-top: 10px;
+}
+
+.home-sub {
+  color: var(--muted);
+  margin: 10px 0 0;
+  font-size: 15px;
+  max-width: 480px;
+}
+
+.home-status {
+  color: var(--muted);
+  font-size: 13px;
+}
+
+.hero-stats {
+  display: flex;
+  gap: 10px;
+  margin-top: 26px;
+}
+
+.stat-chip {
+  display: flex;
+  align-items: baseline;
+  gap: 7px;
+  background: var(--panel);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  padding: 10px 16px;
+}
+
+.stat-num {
+  font-size: 18px;
+  color: var(--text);
+}
+
+.stat-label {
+  font-size: 12px;
+  color: var(--muted-dim);
+}
+
+.topic-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
+  gap: 18px;
+  margin-top: 32px;
+}

@@ -1,0 +1,40 @@
+.circuit-wrap {
+  width: 100%;
+  overflow-x: auto;
+}
+
+.circuit-svg {
+  width: 100%;
+  min-width: 560px;
+  height: auto;
+}
+
+.circuit-line {
+  stroke: var(--border-strong);
+  stroke-width: 2;
+  transition: stroke 0.3s ease;
+}
+.circuit-line.active {
+  stroke: var(--mint);
+}
+
+.circuit-node-ring {
+  fill: var(--panel);
+  stroke: var(--border-strong);
+  stroke-width: 2;
+  transition: stroke 0.3s ease;
+}
+.circuit-node.status-learning .circuit-node-ring { stroke: var(--accent); }
+.circuit-node.status-completed .circuit-node-ring { stroke: var(--mint); }
+
+.circuit-node-core {
+  fill: var(--muted-dim);
+  transition: fill 0.3s ease;
+}
+.circuit-node.status-learning .circuit-node-core { fill: var(--accent); }
+.circuit-node.status-completed .circuit-node-core { fill: var(--mint); }
+
+.circuit-node-label {
+  fill: var(--muted);
+  font-size: 11px;
+}
