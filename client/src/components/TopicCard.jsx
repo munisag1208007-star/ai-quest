@@ -16,141 +16,185 @@ function hexToRgb(hex) {
   return `${(num >> 16) & 255}, ${(num >> 8) & 255}, ${num & 255}`;
 }
 
-function TopicLogo({ id, color }) {
+// 대형 3D 브랜드/개념 엠블럼 로고 컴포넌트
+function Large3DEmblem({ id, name, maker, color }) {
   switch (id) {
     case "claude":
       return (
-        <svg viewBox="0 0 48 48" className="topic-3d-svg">
+        <svg viewBox="0 0 120 120" className="large-emblem-svg">
           <defs>
-            <linearGradient id="claudeGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+            <linearGradient id="claudeMain" x1="0%" y1="0%" x2="100%" y2="100%">
               <stop offset="0%" stopColor="#F5A623" />
               <stop offset="100%" stopColor="#D97706" />
             </linearGradient>
-            <filter id="glowClaude" x="-20%" y="-20%" width="140%" height="140%">
-              <feGaussianBlur stdDeviation="2" result="blur" />
+            <filter id="claudeGlow" x="-30%" y="-30%" width="160%" height="160%">
+              <feGaussianBlur stdDeviation="4" result="blur" />
               <feComposite in="SourceGraphic" in2="blur" operator="over" />
             </filter>
           </defs>
+          {/* 뒤 배경 3D 후광 링 */}
+          <circle cx="60" cy="52" r="42" fill="#F5A623" opacity="0.08" filter="url(#claudeGlow)" />
+          <circle cx="60" cy="52" r="34" fill="none" stroke="#F5A623" strokeWidth="1.5" strokeDasharray="6 4" opacity="0.3" />
+          {/* Claude 앤스로픽 3D 별빛 스파크 엠블럼 */}
           <path
-            d="M24 4 L28.5 17.5 L42 18 L31.5 26.5 L35 40 L24 31.5 L13 40 L16.5 26.5 L6 18 L19.5 17.5 Z"
-            fill="url(#claudeGrad)"
-            filter="url(#glowClaude)"
+            d="M60 12 L69 40 L96 42 L74 58 L82 85 L60 69 L38 85 L46 58 L24 42 L51 40 Z"
+            fill="url(#claudeMain)"
+            filter="url(#claudeGlow)"
           />
-          <circle cx="24" cy="24" r="5" fill="#FFF" opacity="0.9" />
+          <circle cx="60" cy="52" r="8" fill="#FFF" opacity="0.95" />
         </svg>
       );
     case "chatgpt":
       return (
-        <svg viewBox="0 0 48 48" className="topic-3d-svg">
+        <svg viewBox="0 0 120 120" className="large-emblem-svg">
           <defs>
-            <linearGradient id="gptGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+            <linearGradient id="gptMain" x1="0%" y1="0%" x2="100%" y2="100%">
               <stop offset="0%" stopColor="#6EE7B7" />
               <stop offset="100%" stopColor="#059669" />
             </linearGradient>
+            <filter id="gptGlow" x="-30%" y="-30%" width="160%" height="160%">
+              <feGaussianBlur stdDeviation="4" result="blur" />
+              <feComposite in="SourceGraphic" in2="blur" operator="over" />
+            </filter>
           </defs>
-          <g transform="translate(24, 24)" fill="none" stroke="url(#gptGrad)" strokeWidth="3" strokeLinecap="round">
-            <circle cx="0" cy="0" r="18" strokeDasharray="6 4" opacity="0.4" />
-            <path d="M0 -15 A15 15 0 0 1 13 7.5 L5 2.8" />
-            <path d="M0 -15 A15 15 0 0 1 13 7.5 L5 2.8" transform="rotate(60)" />
-            <path d="M0 -15 A15 15 0 0 1 13 7.5 L5 2.8" transform="rotate(120)" />
-            <path d="M0 -15 A15 15 0 0 1 13 7.5 L5 2.8" transform="rotate(180)" />
-            <path d="M0 -15 A15 15 0 0 1 13 7.5 L5 2.8" transform="rotate(240)" />
-            <path d="M0 -15 A15 15 0 0 1 13 7.5 L5 2.8" transform="rotate(300)" />
-            <circle cx="0" cy="0" r="4" fill="#6EE7B7" stroke="none" />
+          <circle cx="60" cy="52" r="42" fill="#6EE7B7" opacity="0.08" filter="url(#gptGlow)" />
+          {/* OpenAI 3D 노드 스파이럴 기하학 */}
+          <g transform="translate(60, 52)" fill="none" stroke="url(#gptMain)" strokeWidth="4.5" strokeLinecap="round">
+            <circle cx="0" cy="0" r="32" strokeDasharray="8 6" opacity="0.3" />
+            <path d="M0 -28 A28 28 0 0 1 24.2 14 L9.3 5.4" />
+            <path d="M0 -28 A28 28 0 0 1 24.2 14 L9.3 5.4" transform="rotate(60)" />
+            <path d="M0 -28 A28 28 0 0 1 24.2 14 L9.3 5.4" transform="rotate(120)" />
+            <path d="M0 -28 A28 28 0 0 1 24.2 14 L9.3 5.4" transform="rotate(180)" />
+            <path d="M0 -28 A28 28 0 0 1 24.2 14 L9.3 5.4" transform="rotate(240)" />
+            <path d="M0 -28 A28 28 0 0 1 24.2 14 L9.3 5.4" transform="rotate(300)" />
+            <circle cx="0" cy="0" r="7" fill="#6EE7B7" stroke="none" />
           </g>
         </svg>
       );
     case "gemini":
       return (
-        <svg viewBox="0 0 48 48" className="topic-3d-svg">
+        <svg viewBox="0 0 120 120" className="large-emblem-svg">
           <defs>
-            <linearGradient id="gemGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+            <linearGradient id="gemMain" x1="0%" y1="0%" x2="100%" y2="100%">
               <stop offset="0%" stopColor="#7DD3FC" />
               <stop offset="50%" stopColor="#38BDF8" />
               <stop offset="100%" stopColor="#818CF8" />
             </linearGradient>
+            <filter id="gemGlow" x="-30%" y="-30%" width="160%" height="160%">
+              <feGaussianBlur stdDeviation="5" result="blur" />
+              <feComposite in="SourceGraphic" in2="blur" operator="over" />
+            </filter>
           </defs>
+          <circle cx="60" cy="52" r="44" fill="#7DD3FC" opacity="0.08" filter="url(#gemGlow)" />
+          {/* 구글 제미나이 4-포인트 3D 다이아몬드 스파클 */}
           <path
-            d="M24 4 C24 15 15 24 4 24 C15 24 24 33 24 44 C24 33 33 24 44 24 C33 24 24 15 24 4 Z"
-            fill="url(#gemGrad)"
+            d="M60 12 C60 34 38 52 16 52 C38 52 60 70 60 92 C60 70 82 52 104 52 C82 52 60 34 60 12 Z"
+            fill="url(#gemMain)"
+            filter="url(#gemGlow)"
           />
           <path
-            d="M24 12 C24 18 18 24 12 24 C18 24 24 30 24 36 C24 30 30 24 36 24 C30 24 24 18 24 12 Z"
+            d="M60 28 C60 41 47 52 34 52 C47 52 60 63 60 76 C60 63 73 52 86 52 C73 52 60 41 60 28 Z"
             fill="#FFF"
-            opacity="0.8"
+            opacity="0.95"
           />
         </svg>
       );
     case "grok":
       return (
-        <svg viewBox="0 0 48 48" className="topic-3d-svg">
+        <svg viewBox="0 0 120 120" className="large-emblem-svg">
           <defs>
-            <linearGradient id="grokGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+            <linearGradient id="grokMain" x1="0%" y1="0%" x2="100%" y2="100%">
               <stop offset="0%" stopColor="#F87171" />
               <stop offset="100%" stopColor="#DC2626" />
             </linearGradient>
+            <filter id="grokGlow" x="-30%" y="-30%" width="160%" height="160%">
+              <feGaussianBlur stdDeviation="4" result="blur" />
+              <feComposite in="SourceGraphic" in2="blur" operator="over" />
+            </filter>
           </defs>
-          <rect x="8" y="8" width="32" height="32" rx="8" fill="url(#grokGrad)" opacity="0.15" />
-          <path d="M12 12 L36 36 M36 12 L12 36" stroke="url(#grokGrad)" strokeWidth="4.5" strokeLinecap="round" />
-          <circle cx="24" cy="24" r="5" fill="#F87171" />
+          {/* xAI Grok 슬릭 X 3D 실드 */}
+          <rect x="20" y="12" width="80" height="80" rx="20" fill="url(#grokMain)" opacity="0.15" />
+          <rect x="24" y="16" width="72" height="72" rx="16" fill="none" stroke="url(#grokMain)" strokeWidth="2" opacity="0.4" />
+          <path d="M30 22 L90 82 M90 22 L30 82" stroke="url(#grokMain)" strokeWidth="9" strokeLinecap="round" filter="url(#grokGlow)" />
+          <circle cx="60" cy="52" r="10" fill="#F87171" />
         </svg>
       );
     case "ai-agent":
       return (
-        <svg viewBox="0 0 48 48" className="topic-3d-svg">
+        <svg viewBox="0 0 120 120" className="large-emblem-svg">
           <defs>
-            <linearGradient id="agentGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+            <linearGradient id="agentMain" x1="0%" y1="0%" x2="100%" y2="100%">
               <stop offset="0%" stopColor="#C4B5FD" />
               <stop offset="100%" stopColor="#8B5CF6" />
             </linearGradient>
+            <filter id="agentGlow" x="-30%" y="-30%" width="160%" height="160%">
+              <feGaussianBlur stdDeviation="4" result="blur" />
+              <feComposite in="SourceGraphic" in2="blur" operator="over" />
+            </filter>
           </defs>
-          <ellipse cx="24" cy="24" rx="18" ry="7" fill="none" stroke="url(#agentGrad)" strokeWidth="2" transform="rotate(-25 24 24)" opacity="0.7" />
-          <ellipse cx="24" cy="24" rx="18" ry="7" fill="none" stroke="url(#agentGrad)" strokeWidth="2" transform="rotate(35 24 24)" opacity="0.7" />
-          <circle cx="24" cy="24" r="9" fill="url(#agentGrad)" />
-          <circle cx="21" cy="22" r="2.5" fill="#FFF" />
-          <circle cx="27" cy="22" r="2.5" fill="#FFF" />
+          {/* AI 에이전트 자율 보트 크리스탈 구체 & 궤도 링 */}
+          <ellipse cx="60" cy="52" rx="42" ry="16" fill="none" stroke="url(#agentMain)" strokeWidth="3" transform="rotate(-25 60 52)" opacity="0.65" />
+          <ellipse cx="60" cy="52" rx="42" ry="16" fill="none" stroke="url(#agentMain)" strokeWidth="3" transform="rotate(35 60 52)" opacity="0.65" />
+          <circle cx="60" cy="52" r="22" fill="url(#agentMain)" filter="url(#agentGlow)" />
+          <circle cx="53" cy="47" r="5" fill="#FFF" />
+          <circle cx="67" cy="47" r="5" fill="#FFF" />
         </svg>
       );
     case "prompt-engineering":
       return (
-        <svg viewBox="0 0 48 48" className="topic-3d-svg">
+        <svg viewBox="0 0 120 120" className="large-emblem-svg">
           <defs>
-            <linearGradient id="promptGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+            <linearGradient id="promptMain" x1="0%" y1="0%" x2="100%" y2="100%">
               <stop offset="0%" stopColor="#FDBA74" />
               <stop offset="100%" stopColor="#EA580C" />
             </linearGradient>
+            <filter id="promptGlow" x="-30%" y="-30%" width="160%" height="160%">
+              <feGaussianBlur stdDeviation="4" result="blur" />
+              <feComposite in="SourceGraphic" in2="blur" operator="over" />
+            </filter>
           </defs>
-          <rect x="6" y="10" width="36" height="28" rx="6" fill="#1E293B" stroke="url(#promptGrad)" strokeWidth="2" />
-          <path d="M14 20 L20 24 L14 28" fill="none" stroke="url(#promptGrad)" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round" />
-          <line x1="24" y1="28" x2="32" y2="28" stroke="url(#promptGrad)" strokeWidth="3" strokeLinecap="round" />
+          {/* 프롬프트 엔지니어링 3D 터미널 커맨드 블록 */}
+          <rect x="18" y="20" width="84" height="64" rx="14" fill="#0F172A" stroke="url(#promptMain)" strokeWidth="3.5" filter="url(#promptGlow)" />
+          <path d="M34 42 L48 52 L34 62" fill="none" stroke="url(#promptMain)" strokeWidth="5.5" strokeLinecap="round" strokeLinejoin="round" />
+          <line x1="58" y1="62" x2="80" y2="62" stroke="url(#promptMain)" strokeWidth="5.5" strokeLinecap="round" />
         </svg>
       );
     case "generative-ai":
       return (
-        <svg viewBox="0 0 48 48" className="topic-3d-svg">
+        <svg viewBox="0 0 120 120" className="large-emblem-svg">
           <defs>
-            <linearGradient id="genGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+            <linearGradient id="genMain" x1="0%" y1="0%" x2="100%" y2="100%">
               <stop offset="0%" stopColor="#A7F3D0" />
               <stop offset="100%" stopColor="#059669" />
             </linearGradient>
+            <filter id="genGlow" x="-30%" y="-30%" width="160%" height="160%">
+              <feGaussianBlur stdDeviation="4" result="blur" />
+              <feComposite in="SourceGraphic" in2="blur" operator="over" />
+            </filter>
           </defs>
-          <polygon points="24,6 40,15 40,33 24,42 8,33 8,15" fill="url(#genGrad)" opacity="0.25" stroke="url(#genGrad)" strokeWidth="2" />
-          <polygon points="24,6 40,15 24,24 8,15" fill="url(#genGrad)" opacity="0.6" />
-          <polygon points="24,24 40,15 40,33 24,42" fill="url(#genGrad)" opacity="0.4" />
-          <polygon points="24,24 8,15 8,33 24,42" fill="url(#genGrad)" opacity="0.8" />
+          {/* 생성형 AI 3D 프리즘 크리스탈 다면체 */}
+          <polygon points="60,12 100,32 100,72 60,92 20,72 20,32" fill="url(#genMain)" opacity="0.2" stroke="url(#genMain)" strokeWidth="3" filter="url(#genGlow)" />
+          <polygon points="60,12 100,32 60,52 20,32" fill="url(#genMain)" opacity="0.75" />
+          <polygon points="60,52 100,32 100,72 60,92" fill="url(#genMain)" opacity="0.5" />
+          <polygon points="60,52 20,32 20,72 60,92" fill="url(#genMain)" opacity="0.9" />
         </svg>
       );
     case "ai-ethics":
       return (
-        <svg viewBox="0 0 48 48" className="topic-3d-svg">
+        <svg viewBox="0 0 120 120" className="large-emblem-svg">
           <defs>
-            <linearGradient id="ethicsGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+            <linearGradient id="ethicsMain" x1="0%" y1="0%" x2="100%" y2="100%">
               <stop offset="0%" stopColor="#FCA5A5" />
               <stop offset="100%" stopColor="#E11D48" />
             </linearGradient>
+            <filter id="ethicsGlow" x="-30%" y="-30%" width="160%" height="160%">
+              <feGaussianBlur stdDeviation="4" result="blur" />
+              <feComposite in="SourceGraphic" in2="blur" operator="over" />
+            </filter>
           </defs>
-          <path d="M24 6 L38 12 V22 C38 32 24 40 24 40 C24 40 10 32 10 22 V12 L24 6 Z" fill="url(#ethicsGrad)" opacity="0.2" stroke="url(#ethicsGrad)" strokeWidth="2" />
-          <path d="M24 16 C21 13 16 14 16 18 C16 23 24 28 24 28 C24 28 32 23 32 18 C32 14 27 13 24 16 Z" fill="url(#ethicsGrad)" />
+          {/* AI 윤리 3D 정스티스 실드 & 회로 하트 */}
+          <path d="M60 12 L96 26 V48 C96 70 60 88 60 88 C60 88 24 70 24 48 V26 L60 12 Z" fill="url(#ethicsMain)" opacity="0.25" stroke="url(#ethicsMain)" strokeWidth="3.5" filter="url(#ethicsGlow)" />
+          <path d="M60 34 C53 27 41 29 41 39 C41 50 60 62 60 62 C60 62 79 50 79 39 C79 29 67 27 60 34 Z" fill="url(#ethicsMain)" />
         </svg>
       );
     default:
@@ -175,8 +219,8 @@ export default function TopicCard({ topic, index }) {
     const pctX = Math.round((x / width) * 100);
     const pctY = Math.round((y / height) * 100);
 
-    const rotateY = Math.round(((x / width) - 0.5) * 24);
-    const rotateX = Math.round(-((y / height) - 0.5) * 24);
+    const rotateY = Math.round(((x / width) - 0.5) * 26);
+    const rotateX = Math.round(-((y / height) - 0.5) * 26);
 
     setTilt({ rotateX, rotateY, spotX: pctX, spotY: pctY });
   }
@@ -199,8 +243,8 @@ export default function TopicCard({ topic, index }) {
     const y = touch.clientY - rect.top;
     const pctX = Math.round((x / rect.width) * 100);
     const pctY = Math.round((y / rect.height) * 100);
-    const rotateY = Math.round(((x / rect.width) - 0.5) * 16);
-    const rotateX = Math.round(-((y / rect.height) - 0.5) * 16);
+    const rotateY = Math.round(((x / rect.width) - 0.5) * 18);
+    const rotateX = Math.round(-((y / rect.height) - 0.5) * 18);
     setTilt({ rotateX, rotateY, spotX: pctX, spotY: pctY });
   }
 
@@ -214,8 +258,8 @@ export default function TopicCard({ topic, index }) {
     if (x >= 0 && x <= rect.width && y >= 0 && y <= rect.height) {
       const pctX = Math.round((x / rect.width) * 100);
       const pctY = Math.round((y / rect.height) * 100);
-      const rotateY = Math.round(((x / rect.width) - 0.5) * 16);
-      const rotateX = Math.round(-((y / rect.height) - 0.5) * 16);
+      const rotateY = Math.round(((x / rect.width) - 0.5) * 18);
+      const rotateX = Math.round(-((y / rect.height) - 0.5) * 18);
       setTilt({ rotateX, rotateY, spotX: pctX, spotY: pctY });
     }
   }
@@ -233,7 +277,7 @@ export default function TopicCard({ topic, index }) {
     <div className="topic-card-wrapper">
       <button
         ref={cardRef}
-        className={`topic-card status-${topic.status} ${isHovered ? "is-hovered" : ""}`}
+        className={`topic-emblem-card status-${topic.status} ${isHovered ? "is-hovered" : ""}`}
         style={{
           "--accent": topic.color,
           "--accent-rgb": rgb,
@@ -254,24 +298,35 @@ export default function TopicCard({ topic, index }) {
         {/* 커서/터치 추적 3D 스포트라이트 조명 레이어 */}
         <div className="topic-card-spotlight" />
 
-        {/* 테두리 굴절 시각 효과 (Specular Border Glow) */}
+        {/* 테두리 굴절 스펙큘러 라이트 */}
         <div className="topic-card-border-glow" />
 
+        {/* 넘버링 워터마크 */}
         <span className="topic-card-ghost mono" aria-hidden="true">
           {String(index + 1).padStart(2, "0")}
         </span>
 
-        <div className="topic-card-top">
-          <div className="topic-card-3d-badge">
-            <TopicLogo id={topic.id} color={topic.color} />
-          </div>
+        {/* 상단 상태 뱃지 */}
+        <div className="emblem-card-header">
           <span className={`topic-card-status status-${topic.status}`}>
             {STATUS_LABEL[topic.status]}
           </span>
         </div>
 
-        <h3 className="topic-card-name">{topic.name}</h3>
-        <p className="topic-card-maker mono">{topic.maker}</p>
+        {/* 카드 중앙: 대형 3D 브랜드 엠블럼 스파크 */}
+        <div className="hero-emblem-container">
+          <Large3DEmblem id={topic.id} name={topic.name} maker={topic.maker} color={topic.color} />
+          
+          {/* 엠블럼 일체형 브랜드 타이틀 & 메이커 태그 */}
+          <div className="emblem-integrated-title">
+            <h3 className="emblem-title-text" style={{ color: topic.color }}>
+              {topic.name}
+            </h3>
+            <span className="emblem-maker-badge mono">{topic.maker}</span>
+          </div>
+        </div>
+
+        {/* 카드의 슬림 하단 설명 & 버튼 */}
         <p className="topic-card-tagline">{topic.tagline}</p>
 
         <div className="topic-card-footer">
@@ -285,4 +340,5 @@ export default function TopicCard({ topic, index }) {
     </div>
   );
 }
+
 
