@@ -1,0 +1,220 @@
+.tutor-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  margin-bottom: 24px;
+}
+
+.tutor-title {
+  font-size: 30px;
+  font-weight: 700;
+  margin-top: 4px;
+  background: linear-gradient(135deg, var(--text) 30%, var(--amber) 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+
+.tutor-sub {
+  color: var(--muted);
+  font-size: 15px;
+  margin-top: 6px;
+}
+
+/* 추천 질문 칩 */
+.suggested-chips-section {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  padding: 14px 20px;
+  margin-bottom: 20px;
+  overflow-x: auto;
+}
+
+.suggested-label {
+  font-size: 13px;
+  color: var(--amber);
+  white-space: nowrap;
+  font-weight: 600;
+}
+
+.suggested-chips {
+  display: flex;
+  gap: 10px;
+  flex-wrap: nowrap;
+}
+
+.sq-chip {
+  background: rgba(125, 211, 252, 0.08);
+  border: 1px solid rgba(125, 211, 252, 0.25);
+  color: var(--text);
+  padding: 6px 14px;
+  border-radius: 20px;
+  font-size: 13px;
+  cursor: pointer;
+  white-space: nowrap;
+  transition: all 0.2s ease;
+}
+
+.sq-chip:hover {
+  background: rgba(125, 211, 252, 0.2);
+  border-color: #7dd3fc;
+  transform: translateY(-2px);
+}
+
+/* 메인 챗 카드 */
+.tutor-chat-card {
+  display: flex;
+  flex-direction: column;
+  height: 600px;
+  background: var(--panel);
+  border: 1px solid var(--border-strong);
+  overflow: hidden;
+}
+
+.chat-messages-container {
+  flex: 1;
+  padding: 24px;
+  overflow-y: auto;
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+.chat-bubble-row {
+  display: flex;
+  gap: 14px;
+  max-width: 85%;
+}
+
+.chat-bubble-row.user {
+  align-self: flex-end;
+  flex-direction: row-reverse;
+}
+
+.chat-bubble-row.assistant {
+  align-self: flex-start;
+}
+
+.chat-avatar {
+  width: 38px;
+  height: 38px;
+  border-radius: 50%;
+  background: var(--panel-raised);
+  border: 1px solid var(--border-strong);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 20px;
+  flex-shrink: 0;
+}
+
+.chat-bubble-row.user .chat-avatar {
+  background: rgba(245, 166, 35, 0.2);
+  border-color: var(--amber);
+}
+
+.chat-bubble-content {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.chat-meta {
+  font-size: 11px;
+  color: var(--muted-dim);
+  display: flex;
+  gap: 8px;
+}
+
+.chat-bubble-row.user .chat-meta {
+  justify-content: flex-end;
+}
+
+.chat-text {
+  padding: 14px 18px;
+  border-radius: 16px;
+  font-size: 14px;
+  line-height: 1.6;
+}
+
+.chat-bubble-row.assistant .chat-text {
+  background: rgba(255, 255, 255, 0.04);
+  border: 1px solid var(--border);
+  border-top-left-radius: 4px;
+  color: var(--text);
+}
+
+.chat-bubble-row.user .chat-text {
+  background: var(--amber);
+  color: var(--ink);
+  border-top-right-radius: 4px;
+  font-weight: 500;
+}
+
+.chat-bubble-row.user .chat-text p {
+  color: var(--ink);
+}
+
+/* 타이핑 인디케이터 */
+.tutor-typing-indicator {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 12px 18px;
+  background: rgba(255, 255, 255, 0.04);
+  border-radius: 16px;
+  border: 1px solid var(--border);
+  width: fit-content;
+}
+
+.tutor-typing-indicator span {
+  width: 8px;
+  height: 8px;
+  background: var(--amber);
+  border-radius: 50%;
+  animation: typingBounce 1.4s infinite ease-in-out both;
+}
+
+.tutor-typing-indicator span:nth-child(1) { animation-delay: -0.32s; }
+.tutor-typing-indicator span:nth-child(2) { animation-delay: -0.16s; }
+
+@keyframes typingBounce {
+  0%, 80%, 100% { transform: scale(0); }
+  40% { transform: scale(1); }
+}
+
+.chat-error {
+  padding: 10px;
+  text-align: center;
+}
+
+/* 입력 바 */
+.chat-input-area {
+  display: flex;
+  gap: 12px;
+  padding: 16px 24px;
+  background: rgba(11, 18, 32, 0.8);
+  border-top: 1px solid var(--border);
+}
+
+.chat-textarea {
+  flex: 1;
+  background: rgba(255, 255, 255, 0.03);
+  border: 1px solid var(--border-strong);
+  border-radius: var(--radius-sm);
+  color: var(--text);
+  padding: 10px 14px;
+  font-size: 14px;
+  resize: none;
+  outline: none;
+}
+
+.chat-textarea:focus {
+  border-color: var(--amber);
+}
+
+.send-btn {
+  padding: 0 24px;
+  font-weight: 700;
+  white-space: nowrap;
+}

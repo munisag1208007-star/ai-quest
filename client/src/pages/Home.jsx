@@ -1,4 +1,5 @@
 import { useEffect, useState } from "react";
+import { useNavigate } from "react-router-dom";
 import { useAuth } from "../context/AuthContext.jsx";
 import { api } from "../api.js";
 import Navbar from "../components/Navbar.jsx";
@@ -7,6 +8,7 @@ import "./Home.css";
 
 export default function Home() {
   const { token } = useAuth();
+  const navigate = useNavigate();
   const [topics, setTopics] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
@@ -66,6 +68,57 @@ export default function Home() {
               </div>
             </div>
           )}
+        </section>
+
+        {/* AI Quest 주요 기능 샌드박스 & 게임 아레나 퀵 런치 hub */}
+        <section className="home-hubs-section card fade-in">
+          <p className="eyebrow" style={{ marginBottom: 12 }}>SPECIAL FEATURES · AI HUB</p>
+          <div className="hubs-grid">
+            <div className="hub-card" onClick={() => navigate("/lab")}>
+              <div className="hub-icon">⚡</div>
+              <div className="hub-info">
+                <h4>AI 프롬프트 실습실</h4>
+                <p>페르소나, Few-Shot, CoT 등 온도별 AI 실시간 테스트 샌드박스</p>
+              </div>
+              <span className="hub-arrow">→</span>
+            </div>
+
+            <div className="hub-card" onClick={() => navigate("/arena")}>
+              <div className="hub-icon">⚔️</div>
+              <div className="hub-info">
+                <h4>스피드 퀴즈 아레나</h4>
+                <p>30초 제한시간 타임어택! 연속 정답 콤보 서바이벌 퀴즈</p>
+              </div>
+              <span className="hub-arrow">→</span>
+            </div>
+
+            <div className="hub-card" onClick={() => navigate("/leaderboard")}>
+              <div className="hub-icon">🏆</div>
+              <div className="hub-info">
+                <h4>랭킹 & 명예의 전당</h4>
+                <p>학습자 종합 랭킹과 6종의 성취 뱃지 컬렉션</p>
+              </div>
+              <span className="hub-arrow">→</span>
+            </div>
+
+            <div className="hub-card" onClick={() => navigate("/tutor")}>
+              <div className="hub-icon">🤖</div>
+              <div className="hub-info">
+                <h4>1:1 AI 튜터 챗</h4>
+                <p>24시간 인공지능 용어/개념/코드 질문 튜터링</p>
+              </div>
+              <span className="hub-arrow">→</span>
+            </div>
+
+            <div className="hub-card" onClick={() => navigate("/review")}>
+              <div className="hub-icon">📝</div>
+              <div className="hub-info">
+                <h4>오답 노트 & 스크랩</h4>
+                <p>틀렸던 문항 다시 풀어보기 및 복습 관리</p>
+              </div>
+              <span className="hub-arrow">→</span>
+            </div>
+          </div>
         </section>
 
         {loading && <p className="mono home-status">불러오는 중...</p>}

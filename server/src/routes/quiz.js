@@ -157,6 +157,26 @@ router.post("/:topicId/check", requireAuth, async (req, res) => {
     topic.id
   ]);
 
+  if (!correct) {
+    try {
+      await db.run(
+        `INSERT INTO wrong_answers (user_id, topic_id, question, options_json, correct_index, user_index, explanation, mastered)
+         VALUES (?, ?, ?, ?, ?, ?, ?, 0)`,
+        [
+          req.userId,
+          topic.id,
+          question.question,
+          JSON.stringify(question.options),
+          question.correctIndex,
+          selected,
+          question.explanation
+        ]
+      );
+    } catch (e) {
+      console.error("Failed to save wrong answer:", e);
+    }
+  }
+
   res.json({ correct, correctIndex: question.correctIndex, explanation: question.explanation });
 });
 

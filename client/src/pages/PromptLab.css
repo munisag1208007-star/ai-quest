@@ -1,0 +1,377 @@
+.lab-header {
+  margin-bottom: 24px;
+}
+
+.lab-title {
+  font-size: 30px;
+  font-weight: 700;
+  margin-top: 4px;
+  background: linear-gradient(135deg, var(--text) 30%, var(--amber) 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+
+.lab-sub {
+  color: var(--muted);
+  font-size: 15px;
+  margin-top: 6px;
+  max-width: 800px;
+}
+
+/* 프리셋 스크롤 바 */
+.lab-presets-section {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  padding: 14px 20px;
+  margin-bottom: 24px;
+  overflow-x: auto;
+  border: 1px solid var(--border-strong);
+}
+
+.presets-label {
+  font-size: 13px;
+  color: var(--amber);
+  white-space: nowrap;
+  font-weight: 600;
+}
+
+.presets-chips {
+  display: flex;
+  gap: 10px;
+  flex-wrap: nowrap;
+}
+
+.preset-chip {
+  background: rgba(245, 166, 35, 0.08);
+  border: 1px solid rgba(245, 166, 35, 0.25);
+  color: var(--text);
+  padding: 6px 14px;
+  border-radius: 20px;
+  font-size: 13px;
+  cursor: pointer;
+  white-space: nowrap;
+  transition: all 0.2s ease;
+}
+
+.preset-chip:hover {
+  background: rgba(245, 166, 35, 0.22);
+  border-color: var(--amber);
+  transform: translateY(-2px);
+}
+
+/* 그리드 레이아웃 */
+.lab-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 24px;
+}
+
+@media (max-width: 992px) {
+  .lab-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+/* 왼쪽 에디터 */
+.lab-editor {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+  padding: 24px;
+  background: var(--panel);
+  border: 1px solid var(--border-strong);
+  border-radius: var(--radius-md);
+}
+
+.editor-group {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.editor-label {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font-size: 14px;
+  font-weight: 600;
+}
+
+.editor-hint {
+  font-size: 12px;
+  color: var(--muted-dim);
+  font-weight: 400;
+}
+
+.editor-textarea {
+  width: 100%;
+  background: rgba(11, 18, 32, 0.7);
+  border: 1px solid var(--border-strong);
+  border-radius: var(--radius-sm);
+  color: var(--text);
+  padding: 12px 14px;
+  font-size: 13px;
+  line-height: 1.6;
+  resize: vertical;
+  outline: none;
+  transition: border-color 0.2s ease;
+}
+
+.editor-textarea:focus {
+  border-color: var(--amber);
+  box-shadow: 0 0 0 2px rgba(245, 166, 35, 0.15);
+}
+
+/* 온도 컨트롤 */
+.temp-control {
+  background: rgba(255, 255, 255, 0.02);
+  padding: 16px;
+  border-radius: var(--radius-sm);
+  border: 1px solid var(--border);
+}
+
+.temp-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 10px;
+}
+
+.temp-val {
+  color: var(--amber);
+  font-weight: 700;
+  font-size: 16px;
+  margin-left: 8px;
+}
+
+.temp-status-tag {
+  font-size: 12px;
+  background: rgba(245, 166, 35, 0.12);
+  color: var(--amber);
+  padding: 3px 8px;
+  border-radius: 4px;
+}
+
+.temp-range {
+  width: 100%;
+  accent-color: var(--amber);
+  cursor: pointer;
+}
+
+.temp-ticks {
+  display: flex;
+  justify-content: space-between;
+  font-size: 11px;
+  color: var(--muted-dim);
+  margin-top: 4px;
+}
+
+.editor-actions {
+  display: flex;
+  gap: 12px;
+  margin-top: 8px;
+}
+
+.lab-run-btn {
+  flex: 1;
+  font-size: 15px;
+  font-weight: 700;
+  padding: 12px 20px;
+}
+
+/* 오른쪽 출력 컬럼 */
+.lab-output-col {
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+}
+
+.lab-output {
+  min-height: 380px;
+  display: flex;
+  flex-direction: column;
+  padding: 24px;
+  background: var(--panel);
+  border: 1px solid var(--border-strong);
+  border-radius: var(--radius-md);
+}
+
+.output-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding-bottom: 14px;
+  border-bottom: 1px solid var(--border);
+  margin-bottom: 16px;
+}
+
+.output-title {
+  font-size: 16px;
+  font-weight: 700;
+  color: var(--mint);
+}
+
+.output-metrics {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.metric-chip {
+  font-size: 12px;
+  padding: 4px 8px;
+  border-radius: 6px;
+}
+
+.metric-chip.duration {
+  background: rgba(110, 231, 183, 0.12);
+  color: var(--mint);
+  border: 1px solid rgba(110, 231, 183, 0.3);
+}
+
+.metric-chip.token {
+  background: rgba(125, 211, 252, 0.12);
+  color: #7dd3fc;
+  border: 1px solid rgba(125, 211, 252, 0.3);
+}
+
+.output-content {
+  flex: 1;
+  font-size: 14px;
+  line-height: 1.7;
+}
+
+.empty-output {
+  height: 260px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--muted-dim);
+  text-align: center;
+}
+
+.loading-state {
+  height: 260px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 16px;
+  color: var(--amber);
+}
+
+.pulse-circle {
+  width: 44px;
+  height: 44px;
+  border-radius: 50%;
+  border: 3px solid rgba(245, 166, 35, 0.2);
+  border-top-color: var(--amber);
+  animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+  to { transform: rotate(360deg); }
+}
+
+/* 저장된 템플릿 목록 */
+.lab-saved {
+  padding: 20px;
+  background: var(--panel);
+  border: 1px solid var(--border);
+}
+
+.saved-header h3 {
+  font-size: 15px;
+  font-weight: 600;
+  margin-bottom: 12px;
+}
+
+.empty-saved {
+  font-size: 13px;
+  color: var(--muted-dim);
+}
+
+.saved-list {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.saved-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 10px 14px;
+  background: rgba(255, 255, 255, 0.03);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  cursor: pointer;
+  transition: background 0.2s ease;
+}
+
+.saved-item:hover {
+  background: var(--panel-raised);
+}
+
+.saved-item-title {
+  font-size: 14px;
+  font-weight: 600;
+  display: block;
+}
+
+.saved-item-meta {
+  font-size: 11px;
+  color: var(--muted-dim);
+}
+
+.saved-item-actions {
+  display: flex;
+  gap: 6px;
+}
+
+/* 모달 */
+.modal-backdrop {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.7);
+  backdrop-filter: blur(4px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 100;
+}
+
+.modal-card {
+  width: 90%;
+  max-width: 480px;
+  padding: 24px;
+  background: var(--panel);
+  border: 1px solid var(--amber);
+}
+
+.modal-desc {
+  font-size: 13px;
+  color: var(--muted);
+  margin: 8px 0 16px;
+}
+
+.modal-input {
+  width: 100%;
+  padding: 10px 14px;
+  background: var(--ink);
+  border: 1px solid var(--border-strong);
+  color: var(--text);
+  border-radius: var(--radius-sm);
+  margin-bottom: 20px;
+  font-size: 14px;
+}
+
+.modal-actions {
+  display: flex;
+  gap: 10px;
+  justify-content: flex-end;
+}

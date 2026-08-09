@@ -39,5 +39,26 @@ export const api = {
 
   getDashboard: (token) => request("/api/progress/dashboard", { token }),
   completeTutorial: (token) =>
-    request("/api/progress/complete-tutorial", { method: "POST", token })
+    request("/api/progress/complete-tutorial", { method: "POST", token }),
+
+  // ⚡ 프롬프트 실습실
+  labRun: (token, payload) => request("/api/lab/run", { method: "POST", body: payload, token }),
+  getLabTemplates: (token) => request("/api/lab/templates", { token }),
+  saveLabTemplate: (token, payload) => request("/api/lab/templates", { method: "POST", body: payload, token }),
+  deleteLabTemplate: (token, id) => request(`/api/lab/templates/${id}`, { method: "DELETE", token }),
+
+  // ⚔️ 퀴즈 아레나
+  getArenaQuestions: (token) => request("/api/arena/questions", { token }),
+  submitArenaScore: (token, payload) => request("/api/arena/submit", { method: "POST", body: payload, token }),
+
+  // 🏆 리더보드
+  getLeaderboard: (token) => request("/api/leaderboard", { token }),
+
+  // 🤖 AI 튜터 챗
+  sendTutorChat: (token, payload) => request("/api/tutor/chat", { method: "POST", body: payload, token }),
+
+  // 📝 오답 노트
+  getWrongAnswers: (token) => request("/api/review", { token }),
+  masterWrongAnswer: (token, id) => request(`/api/review/master/${id}`, { method: "POST", token }),
+  deleteWrongAnswer: (token, id) => request(`/api/review/${id}`, { method: "DELETE", token })
 };

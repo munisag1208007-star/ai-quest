@@ -14,7 +14,7 @@ const API_URL = "https://api.groq.com/openai/v1/chat/completions";
  *   - schema: Groq는 OpenAI처럼 엄격한 JSON 스키마 강제(strict mode)를 지원하지 않으므로,
  *             스키마가 있으면 프롬프트에 스키마 설명을 덧붙여서 모델이 형식을 따르도록 유도한다.
  */
-export async function askGemini(prompt, { json = false, schema = null } = {}) {
+export async function askGemini(prompt, { json = false, schema = null, temperature = 0.7 } = {}) {
   const apiKey = process.env.GROQ_API_KEY;
   if (!apiKey || apiKey === "your-groq-api-key") {
     throw new Error(
@@ -30,7 +30,7 @@ export async function askGemini(prompt, { json = false, schema = null } = {}) {
   const body = {
     model: MODEL,
     messages: [{ role: "user", content: finalPrompt }],
-    temperature: 0.7,
+    temperature: temperature !== undefined ? Number(temperature) : 0.7,
     max_tokens: 2048
   };
 

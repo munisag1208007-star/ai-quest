@@ -41,8 +41,15 @@
 
 .navbar-links {
   display: flex;
-  gap: 24px;
+  gap: 18px;
   flex: 1;
+  overflow-x: auto;
+  white-space: nowrap;
+  scrollbar-width: none;
+}
+
+.navbar-links::-webkit-scrollbar {
+  display: none;
 }
 
 .navbar-links a {

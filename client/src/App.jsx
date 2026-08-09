@@ -9,6 +9,11 @@ import Home from "./pages/Home.jsx";
 import Learn from "./pages/Learn.jsx";
 import Quiz from "./pages/Quiz.jsx";
 import Dashboard from "./pages/Dashboard.jsx";
+import PromptLab from "./pages/PromptLab.jsx";
+import QuizArena from "./pages/QuizArena.jsx";
+import Leaderboard from "./pages/Leaderboard.jsx";
+import AITutor from "./pages/AITutor.jsx";
+import Review from "./pages/Review.jsx";
 
 export default function App() {
   return (
@@ -29,6 +34,21 @@ export default function App() {
       } />
       <Route path="/quiz/:topicId" element={
         <ProtectedRoute><Quiz /></ProtectedRoute>
+      } />
+      <Route path="/lab" element={
+        <ProtectedRoute><PromptLab /></ProtectedRoute>
+      } />
+      <Route path="/arena" element={
+        <ProtectedRoute><QuizArena /></ProtectedRoute>
+      } />
+      <Route path="/leaderboard" element={
+        <ProtectedRoute><Leaderboard /></ProtectedRoute>
+      } />
+      <Route path="/tutor" element={
+        <ProtectedRoute><AITutor /></ProtectedRoute>
+      } />
+      <Route path="/review" element={
+        <ProtectedRoute><Review /></ProtectedRoute>
       } />
       <Route path="/dashboard" element={
         <ProtectedRoute><Dashboard /></ProtectedRoute>

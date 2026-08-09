@@ -19,6 +19,21 @@ export default function Navbar() {
           <NavLink to="/" end className={({ isActive }) => (isActive ? "active" : "")}>
             주제
           </NavLink>
+          <NavLink to="/lab" className={({ isActive }) => (isActive ? "active" : "")}>
+            ⚡ 실습실
+          </NavLink>
+          <NavLink to="/arena" className={({ isActive }) => (isActive ? "active" : "")}>
+            ⚔️ 아레나
+          </NavLink>
+          <NavLink to="/leaderboard" className={({ isActive }) => (isActive ? "active" : "")}>
+            🏆 리더보드
+          </NavLink>
+          <NavLink to="/tutor" className={({ isActive }) => (isActive ? "active" : "")}>
+            🤖 AI 튜터
+          </NavLink>
+          <NavLink to="/review" className={({ isActive }) => (isActive ? "active" : "")}>
+            📝 오답 노트
+          </NavLink>
           <NavLink to="/dashboard" className={({ isActive }) => (isActive ? "active" : "")}>
             대시보드
           </NavLink>

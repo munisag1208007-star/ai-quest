@@ -1,0 +1,270 @@
+.lb-header {
+  margin-bottom: 24px;
+}
+
+.lb-title {
+  font-size: 30px;
+  font-weight: 700;
+  margin-top: 4px;
+  background: linear-gradient(135deg, var(--text) 30%, var(--amber) 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+
+.lb-sub {
+  color: var(--muted);
+  font-size: 15px;
+  margin-top: 6px;
+}
+
+.lb-status {
+  color: var(--muted-dim);
+  padding: 24px 0;
+}
+
+.lb-content-wrapper {
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+}
+
+/* 내 순위 카드 */
+.my-rank-banner {
+  padding: 24px;
+  background: linear-gradient(135deg, rgba(245, 166, 35, 0.1) 0%, rgba(18, 27, 46, 0.95) 100%);
+  border: 1px solid var(--amber);
+  box-shadow: 0 8px 24px rgba(245, 166, 35, 0.15);
+}
+
+.my-rank-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 20px;
+  padding-bottom: 14px;
+  border-bottom: 1px solid rgba(245, 166, 35, 0.2);
+}
+
+.my-rank-badge {
+  font-size: 14px;
+  color: var(--amber);
+  background: rgba(245, 166, 35, 0.15);
+  padding: 4px 12px;
+  border-radius: 20px;
+}
+
+.my-user-info {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.my-name {
+  font-size: 18px;
+  font-weight: 700;
+}
+
+.my-score {
+  font-size: 20px;
+  font-weight: 800;
+  color: var(--amber);
+}
+
+.my-rank-stats {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 16px;
+}
+
+@media (max-width: 768px) {
+  .my-rank-stats {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+.m-stat-item {
+  background: rgba(11, 18, 32, 0.6);
+  padding: 12px 16px;
+  border-radius: var(--radius-sm);
+  border: 1px solid var(--border);
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.m-stat-label {
+  font-size: 12px;
+  color: var(--muted);
+}
+
+.m-stat-val {
+  font-size: 16px;
+  font-weight: 700;
+  color: var(--text);
+}
+
+.m-stat-val.grand-val {
+  color: var(--amber);
+}
+
+/* 뱃지 섹션 */
+.badges-section {
+  padding: 24px;
+}
+
+.section-title-wrap {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.section-title-wrap h3 {
+  font-size: 18px;
+  font-weight: 700;
+}
+
+.badges-count {
+  font-size: 13px;
+  color: var(--amber);
+}
+
+.badges-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 16px;
+  margin-top: 16px;
+}
+
+@media (max-width: 768px) {
+  .badges-grid {
+    grid-template-columns: repeat(1, 1fr);
+  }
+}
+
+.badge-card {
+  padding: 16px;
+  border-radius: var(--radius-md);
+  border: 1px solid var(--border);
+  background: rgba(255, 255, 255, 0.02);
+  transition: all 0.2s ease;
+}
+
+.badge-card.unlocked {
+  border-color: rgba(245, 166, 35, 0.4);
+  background: rgba(245, 166, 35, 0.06);
+  box-shadow: 0 4px 16px rgba(245, 166, 35, 0.1);
+}
+
+.badge-card.locked {
+  opacity: 0.55;
+  filter: grayscale(0.8);
+}
+
+.badge-icon-wrap {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 8px;
+}
+
+.badge-name {
+  font-size: 15px;
+  font-weight: 700;
+  color: var(--text);
+}
+
+.unlocked-tag {
+  font-size: 11px;
+  color: var(--mint);
+  background: rgba(110, 231, 183, 0.15);
+  padding: 2px 6px;
+  border-radius: 4px;
+}
+
+.locked-tag {
+  font-size: 11px;
+  color: var(--muted);
+  background: rgba(255, 255, 255, 0.08);
+  padding: 2px 6px;
+  border-radius: 4px;
+}
+
+.badge-desc {
+  font-size: 12px;
+  color: var(--muted);
+  line-height: 1.4;
+  margin: 0;
+}
+
+/* 리더보드 테이블 */
+.leaderboard-table-card {
+  padding: 24px;
+}
+
+.lb-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 14px;
+}
+
+.lb-table th {
+  text-align: left;
+  padding: 12px 14px;
+  color: var(--muted);
+  font-weight: 500;
+  border-bottom: 1px solid var(--border-strong);
+  font-size: 13px;
+}
+
+.lb-table td {
+  padding: 14px;
+  border-bottom: 1px solid var(--border);
+}
+
+.lb-table tr.is-me-row {
+  background: rgba(245, 166, 35, 0.1);
+}
+
+.rank-cell {
+  width: 70px;
+}
+
+.rank-pill {
+  font-weight: 700;
+  font-size: 15px;
+}
+
+.rank-gold {
+  color: #f5a623;
+  font-size: 18px;
+}
+
+.rank-silver {
+  color: #cbd5e1;
+  font-size: 18px;
+}
+
+.rank-bronze {
+  color: #cd7f32;
+  font-size: 18px;
+}
+
+.user-name-cell {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-weight: 600;
+}
+
+.me-tag {
+  font-size: 11px;
+  background: var(--amber);
+  color: var(--ink);
+  padding: 1px 6px;
+  border-radius: 4px;
+  font-weight: 700;
+}
+
+.grand-score-cell {
+  color: var(--amber);
+}

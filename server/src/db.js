@@ -78,6 +78,45 @@ await client.executeMultiple(`
     markdown TEXT NOT NULL,
     created_at TEXT NOT NULL DEFAULT (datetime('now'))
   );
+
+  -- 프롬프트 실습실 저장 템플릿
+  CREATE TABLE IF NOT EXISTS prompt_templates (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    user_id INTEGER NOT NULL,
+    title TEXT NOT NULL,
+    system_prompt TEXT,
+    user_prompt TEXT NOT NULL,
+    temperature REAL DEFAULT 0.7,
+    created_at TEXT NOT NULL DEFAULT (datetime('now')),
+    FOREIGN KEY(user_id) REFERENCES users(id)
+  );
+
+  -- 오답 노트 & 스크랩 문제 보관
+  CREATE TABLE IF NOT EXISTS wrong_answers (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    user_id INTEGER NOT NULL,
+    topic_id TEXT NOT NULL,
+    question TEXT NOT NULL,
+    options_json TEXT NOT NULL,
+    correct_index INTEGER NOT NULL,
+    user_index INTEGER NOT NULL,
+    explanation TEXT NOT NULL,
+    mastered INTEGER NOT NULL DEFAULT 0,
+    created_at TEXT NOT NULL DEFAULT (datetime('now')),
+    FOREIGN KEY(user_id) REFERENCES users(id)
+  );
+
+  -- 퀴즈 아레나 기록
+  CREATE TABLE IF NOT EXISTS arena_records (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    user_id INTEGER NOT NULL,
+    score INTEGER NOT NULL,
+    correct_count INTEGER NOT NULL,
+    total_count INTEGER NOT NULL,
+    time_spent_sec INTEGER NOT NULL,
+    created_at TEXT NOT NULL DEFAULT (datetime('now')),
+    FOREIGN KEY(user_id) REFERENCES users(id)
+  );
 `);
 
 // ---------- 마이그레이션: 이메일 인증 관련 컬럼 추가 ----------
